@@ -1,0 +1,14 @@
+{
+  "name": "umbau-skills",
+  "owner": { "name": "AKUBA GmbH | das-umbau-team.ch" },
+  "metadata": {
+    "description": "Skills für Umbauten: aus Handskizzen massstäbliche Umbaupläne und IFC-Modelle"
+  },
+  "plugins": [
+    {
+      "name": "umbauplan",
+      "source": "./plugins/umbauplan",
+      "description": "Macht aus Handskizzen einen Umbau-Plansatz (PDF: Grundriss, Schnitte, Ansichten, 3D vorher/nachher, Fotos; Bestand/Abbruch/Neu) und ein IFC-Modell."
+    }
+  ]
+}

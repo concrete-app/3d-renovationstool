@@ -1,0 +1,69 @@
+{
+  "projekt": {
+    "name": "Beispiel: Umbau 3.5-Zimmer-Wohnung",
+    "adresse": "Musterstrasse 1, 8000 Zürich",
+    "bauherr": "Beispiel",
+    "plannummer": "B-001",
+    "datum": "2026-10-14",
+    "gezeichnet": "umbauplan",
+    "index": "A",
+    "massstab": 50,
+    "nordwinkel": 0
+  },
+  "geschosse": [
+    {
+      "id": "EG",
+      "name": "Erdgeschoss",
+      "kote": 0,
+      "raumhoehe": 250,
+      "deckenstaerke": 20,
+      "waende": [
+        { "id": "W1", "von": [0, 0], "bis": [1050, 0], "dicke": 30, "status": "bestand" },
+        { "id": "W2", "von": [1050, 0], "bis": [1050, 800], "dicke": 30, "status": "bestand" },
+        { "id": "W3", "von": [1050, 800], "bis": [0, 800], "dicke": 30, "status": "bestand" },
+        { "id": "W4", "von": [0, 800], "bis": [0, 0], "dicke": 30, "status": "bestand" },
+        { "id": "W5", "von": [0, 450], "bis": [1050, 450], "dicke": 15, "status": "bestand" },
+        { "id": "W6", "von": [600, 450], "bis": [600, 0], "dicke": 12, "status": "abbruch" },
+        { "id": "W7", "von": [350, 450], "bis": [350, 800], "dicke": 12, "status": "bestand" },
+        { "id": "W8", "von": [600, 450], "bis": [600, 800], "dicke": 12, "status": "bestand" },
+        { "id": "W9", "von": [850, 450], "bis": [850, 620], "dicke": 10, "status": "neu" },
+        { "id": "W10", "von": [850, 620], "bis": [1050, 620], "dicke": 10, "status": "neu" }
+      ],
+      "oeffnungen": [
+        { "id": "F1", "wand": "W1", "typ": "fenster", "abstand": 120, "breite": 240, "hoehe": 220, "bruestung": 0, "status": "bestand" },
+        { "id": "F2", "wand": "W1", "typ": "fenster", "abstand": 750, "breite": 120, "hoehe": 140, "bruestung": 90, "status": "bestand" },
+        { "id": "F3", "wand": "W2", "typ": "fenster", "abstand": 150, "breite": 100, "hoehe": 140, "bruestung": 90, "status": "neu" },
+        { "id": "F4", "wand": "W3", "typ": "fenster", "abstand": 540, "breite": 80, "hoehe": 80, "bruestung": 130, "status": "bestand" },
+        { "id": "F5", "wand": "W3", "typ": "fenster", "abstand": 830, "breite": 120, "hoehe": 140, "bruestung": 90, "status": "bestand" },
+        { "id": "T1", "wand": "W3", "typ": "tuer", "abstand": 150, "breite": 100, "hoehe": 210, "status": "bestand", "anschlag": "ende", "seite": "links" },
+        { "id": "T2", "wand": "W5", "typ": "tuer", "abstand": 700, "breite": 80, "hoehe": 210, "status": "bestand", "anschlag": "anfang", "seite": "rechts" },
+        { "id": "T3", "wand": "W6", "typ": "tuer", "abstand": 100, "breite": 90, "hoehe": 210, "status": "bestand", "anschlag": "anfang", "seite": "links" },
+        { "id": "T4", "wand": "W5", "typ": "tuer", "abstand": 200, "breite": 90, "hoehe": 210, "status": "bestand", "anschlag": "anfang", "seite": "links" },
+        { "id": "T5", "wand": "W5", "typ": "tuer", "abstand": 400, "breite": 80, "hoehe": 210, "status": "abbruch", "anschlag": "anfang", "seite": "links" },
+        { "id": "T6", "wand": "W8", "typ": "tuer", "abstand": 150, "breite": 80, "hoehe": 210, "status": "neu", "anschlag": "ende", "seite": "rechts" },
+        { "id": "T7", "wand": "W10", "typ": "tuer", "abstand": 40, "breite": 70, "hoehe": 210, "status": "neu", "anschlag": "anfang", "seite": "links" }
+      ],
+      "raeume": [
+        { "name": "Wohnen", "punkt": [300, 220] },
+        { "name": "Küche", "punkt": [850, 250] },
+        { "name": "Zimmer", "punkt": [175, 620] },
+        { "name": "Bad", "punkt": [475, 620] },
+        { "name": "Entrée", "punkt": [720, 700] },
+        { "name": "Reduit", "punkt": [950, 535], "zustand": "neu" }
+      ],
+      "objekte": [
+        { "typ": "kueche", "position": [770, 45], "breite": 260, "tiefe": 60, "status": "abbruch" },
+        { "typ": "kueche", "position": [1005, 230], "breite": 360, "tiefe": 60, "rotation": 90, "status": "neu" },
+        { "typ": "dusche", "position": [401, 502.5], "breite": 90, "tiefe": 90, "status": "neu" },
+        { "typ": "wc", "position": [400, 755], "breite": 40, "tiefe": 60, "rotation": 180, "status": "bestand" },
+        { "typ": "lavabo", "position": [520, 762.5], "breite": 60, "tiefe": 45, "rotation": 180, "status": "bestand" },
+        { "typ": "waschturm", "position": [1005, 487.5], "breite": 60, "tiefe": 60, "status": "neu" },
+        { "typ": "schrank", "position": [314, 650], "breite": 200, "tiefe": 60, "rotation": 90, "status": "bestand" }
+      ]
+    }
+  ],
+  "angenommen": [
+    "Raumhöhe 2.50 (Standardwert)",
+    "Innenwände 12 cm (Standardwert)"
+  ]
+}

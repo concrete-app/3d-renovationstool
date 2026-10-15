@@ -1,0 +1,15 @@
+{
+  "name": "AKUBA GmbH | das-umbau-team.ch",
+  "adresse": {
+    "strasse": "Fischhausenstrasse 9a",
+    "plz_ort": "8722 Kaltbrunn"
+  },
+  "telefon": "055 293 40 60",
+  "email": "info@das-umbau-team.ch",
+  "web": "das-umbau-team.ch",
+  "marke": {
+    "logo": "assets/logo-umbau-team.png",
+    "akzent": "#D71920",
+    "schrift": "Roboto"
+  }
+}

@@ -1,0 +1,12 @@
+[project]
+name = "umbau-skills"
+version = "0.1.0"
+description = "Skills für Umbauten"
+requires-python = ">=3.12,<3.14"
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest", "ifcopenshell>=0.8", "shapely>=2", "matplotlib>=3.8", "pypdf"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
