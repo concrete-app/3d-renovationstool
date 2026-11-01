@@ -66,7 +66,12 @@ ein eigenes schreibst.
   Wand. Steht auf der Skizze der Abstand ab der Innenecke, zähle die halbe Dicke der
   Querwand dazu.
 - `breite`: Rohbaulichte (Maueröffnung).
+- `hoehe`: lichte Höhe der Öffnung. Pflicht bei Fenstern, bei Türen und Durchgängen
+  Standard 210 (dann in `angenommen` eintragen).
 - `bruestung`: Pflicht bei Fenstern, Höhe ab Boden. Fenstertür: `0`.
+- Breite, Höhe und Brüstung stehen mit der `id` im Grundriss neben der Öffnung
+  («F1  70 × 90, BRH 1.10») und als Masskette in den Schnitten. Halte die `id` kurz
+  (`F1`, `T3`), sie ist Teil der Beschriftung.
 - `seite`: wohin die Tür aufgeht, gesehen in Richtung von `von` nach `bis`: `links`
   oder `rechts`. `anschlag`: wo die Bänder sind: `anfang` (beim `von`-Punkt) oder
   `ende`.

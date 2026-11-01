@@ -185,7 +185,9 @@ def masskette(fenster: Fenster, punkte: list[float], achse: str, lage: float, au
     linie(ax, xy(pkt[0], lage), xy(pkt[-1], lage), color=TEXT, linewidth=PT_FEIN, zorder=9)
     for p in pkt:
         px, py = xy(p, lage)
-        linie(ax, (px - t, py - t), (px + t, py + t), color=TEXT, linewidth=PT_MITTEL, zorder=9)
+        # Schrägstrich in Leserichtung der Kette «/»: waagrecht «/», senkrecht (90° gedreht) «\»
+        k = 1 if achse == "x" else -1
+        linie(ax, (px - t, py - k * t), (px + t, py + k * t), color=TEXT, linewidth=PT_MITTEL, zorder=9)
         linie(ax, xy(p, bauteil + aussen * fenster.mm(2)), xy(p, lage + aussen * fenster.mm(1.5)),
               color=LINIE, linewidth=0.25, zorder=9)
     for i, (a, b) in enumerate(zip(pkt, pkt[1:])):

@@ -18,7 +18,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
-from shapely.geometry import LineString, MultiLineString, Polygon, box
+from shapely.geometry import LineString, MultiLineString, Point, Polygon, box
 
 import geometrie
 from blatt import (FUELLUNG, KONTUR, PT_DICK, PT_FEIN, PT_MITTEL, STRICH, SYMBOL, TEXT,
@@ -42,6 +42,12 @@ class Ebene:
         if self.achse == "x":
             return x if self.blick == "plus" else -x
         return -y if self.blick == "plus" else y
+
+    def punkt(self, u: float) -> tuple[float, float]:
+        """Der Punkt auf der Schnittlinie im Grundriss, der in der Ebene bei u liegt."""
+        if self.achse == "x":
+            return (u if self.blick == "plus" else -u, self.lage)
+        return (self.lage, -u if self.blick == "plus" else u)
 
     def tiefe(self, x: float, y: float) -> float:
         d = (y if self.achse == "x" else x) - self.lage
@@ -275,6 +281,29 @@ def hoehen(fenster: Fenster, plan: Plan, u0: float, u1: float, schnitt: bool) ->
               linewidth=PT_DICK * 1.5, zorder=6)
 
 
+def oeffnungen_bemassen(fenster: Fenster, plan: Plan, e: Ebene) -> None:
+    """Senkrechte Massketten an jeder geschnittenen Öffnung: Fenster Boden – Brüstung – Oberkante,
+    Türen und Durchgänge Boden – Oberkante. Die Kette steht auf der Raumseite der Wand.
+    Öffnungen, die wegfallen, bekommen kein Mass."""
+    linie_e = e.linie()
+    abstand = fenster.mm(5)
+    for g in plan.geschosse:
+        innen = geometrie.aussenumriss(g).difference(
+            geometrie.vereinigen(geometrie.wand_polygon(w) for w in g.waende))
+        for o in g.oeffnungen:
+            if parallel(o.wand, e) or o.wirksamer_status == "abbruch":
+                continue
+            for seg in _strecken(geometrie.oeffnung_polygon(o, zugabe=0.01).intersection(linie_e)):
+                ua, ub = e.u_bereich(seg)
+                # rechts der Wand, ausser dort ist kein Raum (Aussenwand)
+                seite = +1 if innen.contains(Point(e.punkt(ub + abstand))) else -1
+                if seite < 0 and not innen.contains(Point(e.punkt(ua - abstand))):
+                    continue
+                kante = ub if seite > 0 else ua
+                punkte = [g.kote, g.kote + o.bruestung, g.kote + o.bruestung + o.hoehe]
+                masskette(fenster, punkte, "y", kante + seite * abstand, seite, kante)
+
+
 # --- Schnittlagen bestimmen -----------------------------------------------
 
 def schnitte_bestimmen(plan: Plan) -> list[Schnitt]:
@@ -374,6 +403,8 @@ def _anordnen(blatt: Blatt, plan: Plan, zeichnungen: list[tuple[str, Ebene]], an
         fenster = blatt.fenster(links, unten, xlim, ylim, massstab)
         zeichnen(fenster, plan, e, ansicht)
         hoehen(fenster, plan, u0, u1, schnitt=not ansicht)
+        if not ansicht:
+            oeffnungen_bemassen(fenster, plan, e)
         titel(fenster, u0, z0 - fenster.mm(5), name)
 
 

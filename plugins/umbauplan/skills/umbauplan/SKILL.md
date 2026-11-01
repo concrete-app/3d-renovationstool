@@ -1,6 +1,6 @@
 ---
 name: umbauplan
-description: Macht aus Handskizzen, Masstexten, Fotos oder einem alten Plan einen massstäblichen Umbau-Plansatz als PDF (Grundriss, Schnitte, Ansichten, 3D vorher/nachher, Fotodokumentation; Bestand schwarz, Abbruch gelb, Neu rot, mit Plankopf) und ein IFC-Modell. Verwenden, wenn jemand einen Grundriss, Umbauplan, Schnitt, eine Ansicht, 3D-Ansicht, Visualisierung oder ein IFC/BIM-Modell aus einer Skizze will.
+description: Macht bei Küchen-, Bad- und Gesamtrenovationen aus Handskizzen, Masstexten, Fotos oder einem alten Plan einen massstäblichen Umbau-Plansatz als PDF (Grundriss, Schnitte, Ansichten, 3D vorher/nachher, Fotodokumentation; Bestand schwarz, Abbruch gelb, Neu rot, mit Plankopf) und ein IFC-Modell. Verwenden, wenn jemand einen Grundriss, Umbauplan, Schnitt, eine Ansicht, 3D-Ansicht, Visualisierung oder ein IFC/BIM-Modell aus einer Skizze will.
 ---
 
 # Umbauplan: Skizze → Plansatz (PDF) + IFC
@@ -11,6 +11,38 @@ Darum sieht jeder Plan gleich aus, und die Masse sind exakt. Das Datenmodell ste
 `datenmodell.md` (zuerst lesen), ein vollständiges Beispiel in `beispiele/wohnung.json`.
 
 `<skill>` ist unten der Ordner, in dem diese SKILL.md liegt.
+
+## Worum es bei den Zeichnungen geht
+
+Die Skizzen und Pläne kommen aus **Küchenumbauten, Badumbauten und
+Gesamtrenovationen** von Wohnungen und Einfamilienhäusern. Lies jede Zeichnung in
+diesem Sinn:
+
+- **Was ein Symbol ist, leitest du aus dem Raum ab.** Ein Rechteck von etwa 60 cm Tiefe
+  entlang einer Küchenwand ist die Küchenzeile (`kueche`), eine Insel davor ebenfalls.
+  Im Bad: kleines Oval an der Wand = `wc`, Rechteck oder Oval mit Kreis = `lavabo`,
+  Quadrat mit Kreuz oder Ablaufpunkt = `dusche`, langes Rechteck = `badewanne`,
+  Waschmaschine und Tumbler übereinander = `waschturm`. Übliche Kürzel: KS (Kühlschrank),
+  GS/GWM (Geschirrspüler), BO/Herd/KF (Backofen, Kochfeld), HS (Hochschrank),
+  WT (Waschtisch), WM/TU (Waschmaschine/Tumbler). Was in keinen Typ passt, wird
+  `andere` mit `bezeichnung`.
+- **Raumnamen ohne Beschriftung** ergeben sich aus der Einrichtung: WC + Lavabo + Dusche
+  oder Wanne = «Bad», nur WC + Lavabo = «WC», Küchenzeile = «Küche». Schreibe sie so in
+  den Plan und nenne sie bei der Rückmeldung, damit die Person korrigieren kann.
+- **Typische Umbauten erkennen:** Wand zwischen Küche und Wohnen/Essen weg (offene
+  Küche), Wanne wird Dusche, Bad wird vergrössert oder ein WC kommt dazu, Tür wird
+  versetzt oder zugemauert, Küchenzeile wird neu angeordnet. Durchgestrichene oder
+  gekreuzte Wände und Apparate sind meist `abbruch`, neu eingezeichnete (oft farbig
+  oder mit anderem Stift) meist `neu`. Bei einer Gesamtrenovation betrifft das oft alle
+  Räume: Bestand vollständig erfassen, nicht nur Küche und Bad.
+- **Neue und alte Einrichtung gehört in `objekte`** mit Status, nicht nur die Wände:
+  Die alte Wanne ist `abbruch`, die neue Dusche `neu`. Das ist für die Bauherrschaft
+  oft der wichtigste Teil des Plans.
+- **Deuten ist erlaubt, erfinden nicht.** Ein Symbol als Dusche zu lesen ist Deutung;
+  ihre Masse zu schätzen ist Erfinden (siehe Grundregeln). Ist ein Symbol mehrdeutig,
+  frage. Steigzonen, Schächte und Leitungen, die auf der Skizze stehen, übernimmst du
+  als Hinweis (`andere` mit `bezeichnung`); ob ein Apparat dort angeschlossen werden
+  kann, entscheidet eine Fachperson.
 
 ## Grundregeln
 
@@ -29,11 +61,14 @@ Darum sieht jeder Plan gleich aus, und die Masse sind exakt. Das Datenmodell ste
 ## Ablauf
 
 1. **Skizze lesen.** Liste für dich: Aussenwände, Innenwände mit Dicke, Türen und
-   Fenster mit Lage und Breite, Raumnamen, eingetragene Masse. Achte darauf, ob die Masse
+   Fenster mit Lage und Breite, Raumnamen, Küchen- und Sanitäreinrichtung (alt und neu),
+   eingetragene Masse. Achte darauf, ob die Masse
    Aussen-, Achs- oder lichte Masse sind (siehe `datenmodell.md`).
 2. **Nachfragen**, gesammelt in einer Nachricht und knapp: welche Masse fehlen (pro Wand
    bzw. Öffnung), was abgebrochen und was neu wird, Projektname, Adresse, Plannummer.
-   Raumhöhe und Fensterbrüstungen nur, wenn sie für den Plan nötig sind (IFC).
+   Die Höhen jeder Öffnung gehören dazu: Fenster Höhe und Brüstung, Türen Höhe. Sie stehen
+   im Grundriss neben der Öffnung und in den Schnitten. Fehlt eine Türhöhe, setzt das Skript
+   210 ein; das ist dann ein Standardwert und gehört in `angenommen`.
 3. **plan.json schreiben** im Arbeitsordner der Person (nicht im Skill-Ordner). Nullpunkt
    in eine Aussenecke, Achsen in cm.
 4. **Prüfen und erzeugen:**
@@ -52,7 +87,7 @@ Darum sieht jeder Plan gleich aus, und die Masse sind exakt. Das Datenmodell ste
    die Koordinaten, statt die Warnung stehen zu lassen.
 6. **Ansehen.** Öffne die Vorschau-PNGs (die Pfade stehen am Ende der Skriptausgabe)
    mit Read und vergleiche es Wand für Wand mit der Skizze: Lage der Türen, Aufschlag,
-   Fenster, Farben. Vergleiche die lichten Masse aus der Skriptausgabe mit den Massen
+   Fenster, Farben, Masse der Öffnungen (F1 70 × 90, BRH 1.10). Vergleiche die lichten Masse aus der Skriptausgabe mit den Massen
    auf der Skizze. Schau auch Schnitt- und 3D-Blatt an: Stehen Abbruch (gelb) und Neu
    (rot) dort, wo die Person sie haben will? Erst dann meldest du das Ergebnis.
 7. **Melden:** Pfade zu PDF und IFC, die Liste der Blätter, Räume mit Fläche (aus der Skriptausgabe, nicht
@@ -79,9 +114,16 @@ bevor du es in den Plan setzt, und frage, wenn darauf Personen oder Privates zu 
 - `<plannummer>_umbau.pdf`, ein Plansatz auf A3, Blätter in dieser Reihenfolge:
   1. **Grundriss** je Geschoss, im echten Massstab (1:50, sonst 1:100): Wände nach Status
      eingefärbt, Türen mit Aufschlag, Fenster, Einrichtung, Raumname mit Fläche und lichten
-     Massen, Aussenmassketten, Schnittlinien.
+     Massen, Aussenmassketten, Schnittlinien. Neben jeder Öffnung ihre Masse in der
+     Statusfarbe: Fenster «F1  70 × 90, BRH 1.10», Türen und Durchgänge «T1  80 × 2.00».
+     Die Beschriftung steht auf der Raumseite parallel zur Wand und weicht Wänden, Einrichtung,
+     Türflügeln und anderen Texten aus. Wo sie nicht passt (kleine Räume, Küchenzeile vor dem
+     Fenster), steht sie zweizeilig; passt auch das nicht, steht an der Öffnung nur die
+     Bezeichnung (F1) und die Masse in der Liste «Öffnungen» neben der Legende.
   2. **Schnitte** A–A und B–B: geschnittene Wände nach Status, was dahinter liegt als
-     Ansicht, Koten und Höhenkette. Ohne Angabe legt das Skript die Schnitte selbst dorthin,
+     Ansicht, Koten und Höhenkette. An jeder geschnittenen Öffnung eine senkrechte Masskette
+     auf der Raumseite: Brüstung und Fensterhöhe, bei Türen die Türhöhe (nicht bei Öffnungen,
+     die wegfallen). Ohne Angabe legt das Skript die Schnitte selbst dorthin,
      wo sie möglichst viele Öffnungen und Umbauteile treffen. Bestimmte Schnitte: `schnitte`
      in `plan.json` (siehe `datenmodell.md`).
   3. **Ansichten** der vier Fassaden, mit Himmelsrichtung, wenn `nordwinkel` angegeben ist.

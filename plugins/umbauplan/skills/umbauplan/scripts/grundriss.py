@@ -2,7 +2,7 @@
 
 Das Blatt (Rahmen, Plankopf, Legende) kommt aus blatt.py; hier steht, was nur
 der Grundriss braucht: Wandflächen nach Status, Türen, Fenster, Einrichtung,
-Raumbeschriftung, Aussenmassketten und die Schnittlinien.
+Raumbeschriftung, Masse der Öffnungen, Aussenmassketten und die Schnittlinien.
 """
 
 from __future__ import annotations
@@ -11,6 +11,7 @@ import math
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle, Ellipse
+from shapely.geometry import LineString, Polygon, box
 
 import geometrie
 from blatt import (FUELLUNG, KONTUR, PT_DICK, PT_FEIN, PT_MITTEL, STRICH, SYMBOL, TEXT, GRAU,
@@ -21,6 +22,7 @@ from modell import Fehlerhaft, Geschoss, Objekt, Oeffnung, Plan, Schnitt, mass_t
 # Platz um den Grundriss für die Massketten (mm): unten und links drei Ketten mit Total,
 # oben und rechts höchstens zwei.
 RAND = {"links": 30.0, "unten": 30.0, "rechts": 22.0, "oben": 22.0}
+BESCHRIFTUNG_PT = 5.5  # Masse der Öffnungen
 
 
 def grenzen(g: Geschoss) -> tuple[float, float, float, float]:
@@ -90,21 +92,28 @@ def oeffnung_zeichnen(ax, o: Oeffnung) -> None:
                   linestyle=(0, (2, 2)), zorder=6)
         return
 
-    # Tür: Flügel 90° offen, Bogen bis zur Gegenseite
+    band, bogen = tuerfluegel(o)
+    linie(ax, band, bogen[0], linewidth=PT_DICK, **kw)
+    ax.plot([p[0] for p in bogen], [p[1] for p in bogen], linewidth=PT_FEIN, color=farbe,
+            linestyle=strich, zorder=6)
+
+
+def tuerfluegel(o: Oeffnung) -> tuple[tuple[float, float], list[tuple[float, float]]]:
+    """Tür: Flügel 90° offen, Bogen bis zur Gegenseite. Gibt (Band, Bogenpunkte ab Flügelende)."""
+    w = o.wand
+    d = w.dicke
+    s0, s1 = o.abstand, o.abstand + o.breite
     seite = 1 if o.seite == "links" else -1
     sb, sg = (s0, s1) if o.anschlag == "anfang" else (s1, s0)
     band = w.punkt(sb, seite * d / 2)
     nx, ny = w.normale
     ende = (band[0] + nx * seite * o.breite, band[1] + ny * seite * o.breite)
     gegen = w.punkt(sg, seite * d / 2)
-    linie(ax, band, ende, linewidth=PT_DICK, **kw)
     a1 = math.atan2(ende[1] - band[1], ende[0] - band[0])
     a2 = math.atan2(gegen[1] - band[1], gegen[0] - band[0])
     delta = (a2 - a1 + math.pi) % (2 * math.pi) - math.pi
-    pts = [(band[0] + o.breite * math.cos(a1 + delta * i / 32),
-            band[1] + o.breite * math.sin(a1 + delta * i / 32)) for i in range(33)]
-    ax.plot([p[0] for p in pts], [p[1] for p in pts], linewidth=PT_FEIN, color=farbe,
-            linestyle=strich, zorder=6)
+    return band, [(band[0] + o.breite * math.cos(a1 + delta * i / 32),
+                   band[1] + o.breite * math.sin(a1 + delta * i / 32)) for i in range(33)]
 
 
 # --- Einrichtung ----------------------------------------------------------
@@ -170,18 +179,141 @@ def objekt_zeichnen(ax, b: Objekt) -> None:
 # --- Räume ----------------------------------------------------------------
 
 def raeume_beschriften(ax, g: Geschoss, blatt: Fenster) -> list:
-    raeume = geometrie.raeume(g, "neu")
-    for r in raeume:
+    """Raumname, Fläche, lichte Masse. Gibt die Textobjekte zurück (damit andere ihnen ausweichen)."""
+    texte = []
+    for r in geometrie.raeume(g, "neu"):
         x, y = r.beschriftungspunkt
-        ax.text(x, y + blatt.mm(2.2), r.name or "?", ha="center", va="bottom", fontsize=8.5,
-                fontweight="bold", color=TEXT, zorder=8)
-        ax.text(x, y, f"{r.m2:.2f} m²", ha="center", va="top", fontsize=7,
-                color=TEXT, zorder=8)
+        texte.append(ax.text(x, y + blatt.mm(2.2), r.name or "?", ha="center", va="bottom",
+                             fontsize=8.5, fontweight="bold", color=TEXT, zorder=8))
+        texte.append(ax.text(x, y, f"{r.m2:.2f} m²", ha="center", va="top", fontsize=7,
+                             color=TEXT, zorder=8))
         if r.ist_rechteck:
             bx, by = r.lichte_masse
-            ax.text(x, y - blatt.mm(4), f"{mass_text(bx)} × {mass_text(by)}", ha="center", va="top",
-                    fontsize=6, color=GRAU, zorder=8)
-    return raeume
+            texte.append(ax.text(x, y - blatt.mm(4), f"{mass_text(bx)} × {mass_text(by)}", ha="center",
+                                 va="top", fontsize=6, color=GRAU, zorder=8))
+    return texte
+
+
+# --- Öffnungen beschriften ------------------------------------------------
+
+def oeffnung_text(o: Oeffnung, zweizeilig: bool = False) -> str:
+    """Fenster «F1  70 × 90, BRH 1.10», Türen und Durchgänge «T1  90 × 2.10»."""
+    text = f"{o.id}  {mass_text(o.breite)} × {mass_text(o.hoehe)}"
+    if o.typ == "fenster":
+        text += ("\n" if zweizeilig else ", ") + f"BRH {mass_text(o.bruestung)}"
+    return text
+
+
+def _textbox(ax, artist) -> Polygon:
+    """Was ein Text auf der Zeichnung belegt, in cm."""
+    bb = artist.get_window_extent(ax.figure.canvas.get_renderer())
+    return box(*bb.transformed(ax.transData.inverted()).extents)
+
+
+def _textgroesse(ax, text: str, fenster: Fenster) -> tuple[float, float]:
+    """Breite und Höhe eines ungedrehten Texts in cm."""
+    t = ax.text(0, 0, text, fontsize=BESCHRIFTUNG_PT, multialignment="center")
+    bb = t.get_window_extent(ax.figure.canvas.get_renderer())
+    t.remove()
+    mm_pro_px = 25.4 / ax.figure.dpi
+    return fenster.mm(bb.width * mm_pro_px), fenster.mm(bb.height * mm_pro_px)
+
+
+def oeffnungen_beschriften(fenster: Fenster, g: Geschoss, schnitte: list[Schnitt],
+                           texte: list) -> list[Oeffnung]:
+    """Jede Öffnung bekommt ihre Masse in der Statusfarbe, parallel zur Wand auf der Raumseite.
+
+    Gesucht wird ein Platz, der keine Wand, kein Objekt, keinen Türflügel und keinen anderen
+    Text überdeckt und innerhalb der Aussenwände liegt (aussen sind die Massketten): zuerst
+    direkt neben der Öffnung, dann entlang der Wand verschoben. Passt der Text nirgends,
+    wird er zweizeilig versucht, zuletzt steht nur die Bezeichnung (F1) an der Öffnung.
+    Diese Öffnungen werden zurückgegeben; ihre Masse kommen in die Liste neben der Legende.
+    """
+    ax = fenster.ax
+    innen = geometrie.aussenumriss(g)
+    hart = [geometrie.wand_polygon(w) for w in g.waende]
+    hart += [geometrie.objekt_polygon(b) for b in g.objekte]
+    for o in g.oeffnungen:
+        if o.typ == "tuer":
+            band, bogen = tuerfluegel(o)
+            hart.append(Polygon([band, *bogen]).buffer(0))
+    hart += [_textbox(ax, t) for t in texte]
+    weich = []  # Schnittlinien: lieber nicht, aber erlaubt
+    for s in schnitte:
+        a, b = ((-1e5, s.lage), (1e5, s.lage)) if s.achse == "x" else ((s.lage, -1e5), (s.lage, 1e5))
+        weich.append(LineString([a, b]).buffer(fenster.mm(0.4)))
+    rand, abstand = fenster.mm(0.4), fenster.mm(1.0)
+    verschiebungen = [0.0] + [v * k * fenster.mm(2.5) for k in range(1, 9) for v in (1, -1)]
+
+    def kandidaten(o: Oeffnung, b: float, h: float):
+        w = o.wand
+        mitte = o.abstand + o.breite / 2
+        seiten = (1, -1)
+        if o.typ == "tuer":  # zuerst auf der Seite ohne Türflügel
+            seiten = (-1, 1) if o.seite == "links" else (1, -1)
+        for seite in seiten:
+            for weiter in (0.0, fenster.mm(3)):
+                q = seite * (w.dicke / 2 + abstand + weiter + h / 2)
+                for v in verschiebungen:
+                    s = mitte + v
+                    rahmen = Polygon([w.punkt(s - b / 2 - rand, q - h / 2 - rand),
+                                      w.punkt(s + b / 2 + rand, q - h / 2 - rand),
+                                      w.punkt(s + b / 2 + rand, q + h / 2 + rand),
+                                      w.punkt(s - b / 2 - rand, q + h / 2 + rand)])
+                    yield w.punkt(s, q), rahmen
+
+    def platz(o: Oeffnung, text: str, mit_weich: bool):
+        b, h = _textgroesse(ax, text, fenster)
+        hindernisse = hart + (weich if not mit_weich else [])
+        for punkt, rahmen in kandidaten(o, b, h):
+            if rahmen.within(innen) and not any(rahmen.intersects(x) for x in hindernisse):
+                return punkt, rahmen
+        return None
+
+    nur_kennung = []
+    for o in g.oeffnungen:
+        varianten = [oeffnung_text(o)]
+        if o.typ == "fenster":
+            varianten.append(oeffnung_text(o, zweizeilig=True))
+        varianten.append(o.id)
+        gefunden = None
+        for text in varianten:
+            for mit_weich in (False, True):
+                ort = platz(o, text, mit_weich)
+                if ort:
+                    gefunden = (text, *ort)
+                    break
+            if gefunden:
+                break
+        if gefunden is None:  # nicht einmal die Bezeichnung passt frei: direkt neben die Öffnung
+            b, h = _textgroesse(ax, o.id, fenster)
+            gefunden = (o.id, *next(kandidaten(o, b, h)))
+        text, punkt, rahmen = gefunden
+        if text == o.id:
+            nur_kennung.append(o)
+        ux, uy = o.wand.richtung
+        winkel = math.degrees(math.atan2(uy, ux))
+        winkel = winkel - 180 if winkel > 90.01 else winkel + 180 if winkel <= -90 else winkel
+        ax.text(*punkt, text, ha="center", va="center", rotation=winkel, rotation_mode="anchor",
+                multialignment="center", fontsize=BESCHRIFTUNG_PT, color=SYMBOL[o.wirksamer_status],
+                zorder=8)
+        hart.append(rahmen)
+    return nur_kennung
+
+
+def oeffnungsliste(blatt: Blatt, oeffnungen: list[Oeffnung]) -> None:
+    """Masse der Öffnungen, die im Grundriss nur ihre Bezeichnung tragen (zu wenig Platz)."""
+    if not oeffnungen:
+        return
+    ax = blatt.papier
+    x, y = 130.0, 57.0
+    ax.text(x, y, "Öffnungen (Breite × Höhe)", ha="left", va="bottom", fontsize=7,
+            fontweight="bold", color=TEXT)
+    zeilen_pro_spalte = 14
+    for i, o in enumerate(oeffnungen):
+        sp, ze = divmod(i, zeilen_pro_spalte)
+        ax.text(x + sp * 48, y - 2 - ze * 3, oeffnung_text(o), ha="left", va="top", fontsize=6,
+                color=SYMBOL[o.wirksamer_status])
 
 
 # --- Bemassung ------------------------------------------------------------
@@ -279,12 +411,14 @@ def grundriss_blatt(plan: Plan, g: Geschoss, schnitte: list[Schnitt], entwurf: b
         oeffnung_zeichnen(ax, o)
     for b in g.objekte:
         objekt_zeichnen(ax, b)
-    raeume_beschriften(ax, g, fenster)
+    texte = raeume_beschriften(ax, g, fenster)
+    nur_kennung = oeffnungen_beschriften(fenster, g, schnitte, texte)
     bemassen(ax, g, fenster)
     schnittlinien(fenster, g, schnitte)
     plankopf(blatt, plan, f"Grundriss {g.name} – Umbau", f"{plan.projekt.plannummer}-{g.id}",
              f"1:{massstab}", entwurf)
     legende(blatt, plan)
+    oeffnungsliste(blatt, nur_kennung)
     if plan.projekt.nordwinkel is not None:
         nordpfeil(blatt, plan.projekt.nordwinkel)
     return blatt, fenster

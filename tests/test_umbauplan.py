@@ -285,6 +285,69 @@ def test_schnitt_zeigt_umbau_farben():
     assert f.neu.contains(Point(-450, 100))       # T5 in W5 wird zugemauert (u = −y)
 
 
+def test_oeffnung_text():
+    import grundriss
+    oeffnungen = {o.id: o for o in pruefen(beispiel()).geschosse[0].oeffnungen}
+    assert grundriss.oeffnung_text(oeffnungen["F2"]) == "F2  1.20 × 1.40, BRH 90"
+    assert grundriss.oeffnung_text(oeffnungen["F2"], zweizeilig=True) == "F2  1.20 × 1.40\nBRH 90"
+    assert grundriss.oeffnung_text(oeffnungen["T1"]) == "T1  1.00 × 2.10"
+
+
+def _bad(b: float, t: float) -> dict:
+    d = kasten(b, t, dicke=15)
+    d["geschosse"][0]["oeffnungen"] = [
+        {"id": "F1", "wand": "W3", "typ": "fenster", "abstand": (b - 55) / 2, "breite": 70, "hoehe": 90,
+         "bruestung": 110, "status": "bestand"},
+        {"id": "T1", "wand": "W1", "typ": "tuer", "abstand": b - 70, "breite": 70, "hoehe": 200,
+         "status": "neu", "anschlag": "ende", "seite": "links"}]
+    d["geschosse"][0]["objekte"] = [
+        {"typ": "wc", "position": [35, t - 30], "breite": 40, "tiefe": 60, "rotation": 180,
+         "status": "bestand"}]
+    return d
+
+
+def test_oeffnungen_im_grundriss_beschriftet():
+    """Kleines Bad (2.10 × 2.60): jede Öffnung trägt ihre Masse, innen und ohne Wand oder WC zu
+    überdecken, in der Statusfarbe."""
+    import grundriss
+    from blatt import SYMBOL
+    plan = pruefen(_bad(210, 260))
+    g = plan.geschosse[0]
+    _, fenster = grundriss.grundriss_blatt(plan, g, [])
+    texte = {t.get_text(): t for t in fenster.ax.texts}
+    assert "T1  70 × 2.00" in texte
+    assert texte.keys() & {"F1  70 × 90, BRH 1.10", "F1  70 × 90\nBRH 1.10"}
+    innen = geometrie.aussenumriss(g)
+    hindernisse = [geometrie.wand_polygon(w) for w in g.waende] + [geometrie.objekt_polygon(b) for b in g.objekte]
+    for text, t in texte.items():
+        if text.startswith(("F1", "T1")):
+            flaeche = grundriss._textbox(fenster.ax, t)
+            assert flaeche.within(innen)
+            assert not any(flaeche.intersects(h) for h in hindernisse), text
+    assert texte["T1  70 × 2.00"].get_color() == SYMBOL["neu"]
+
+
+def test_oeffnung_ohne_platz_kommt_in_die_liste():
+    import grundriss
+    plan = pruefen(_bad(90, 80))
+    g = plan.geschosse[0]
+    g.objekte = []
+    blatt, fenster = grundriss.grundriss_blatt(plan, g, [])
+    assert "F1" in [t.get_text() for t in fenster.ax.texts]
+    assert "F1  70 × 90, BRH 1.10" in [t.get_text() for t in blatt.papier.texts]
+
+
+def test_schnitt_bemasst_geschnittene_oeffnungen():
+    """B–B durch F1 (Fenster) und T1 (Tür): senkrechte Ketten Brüstung, Fensterhöhe, Türhöhe."""
+    import ansichten
+    from blatt import Blatt
+    plan = pruefen(_bad(210, 260))
+    e = ansichten.Ebene("y", 136, "plus")
+    fenster = Blatt().fenster(0, 0, (-400, 100), (-50, 300), 50)
+    ansichten.oeffnungen_bemassen(fenster, plan, e)
+    assert sorted(t.get_text() for t in fenster.ax.texts) == ["1.10", "2.00", "90"]
+
+
 @pytest.mark.parametrize("nordwinkel, erste", [(0, "Ansicht Süd"), (90, "Ansicht Ost"),
                                                (None, "Ansicht Planseite unten")])
 def test_ansicht_himmelsrichtung(nordwinkel, erste):
