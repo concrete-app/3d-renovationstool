@@ -423,6 +423,34 @@ def test_foto_fehlt_oder_heic(tmp_path):
     assert "gibtsnicht.jpg gibt es nicht" in text and "HEIC" in text
 
 
+
+def test_visualisierung_vorher_nachher(tmp_path):
+    import pdf
+    from PIL import Image
+    from pypdf import PdfReader
+    Image.new("RGB", (400, 300), "#8899AA").save(tmp_path / "kueche.jpg")
+    Image.new("RGB", (600, 450), "#AABB99").save(tmp_path / "kueche_neu.png")
+    d = beispiel()
+    d["fotos"] = [{"datei": "kueche.jpg", "titel": "Küche heute"}]
+    d["visualisierungen"] = [{"vorher": "kueche.jpg", "nachher": "kueche_neu.png",
+                              "titel": "Küche", "wuensche": "Fronten salbeigrün, Eiche"}]
+    d["blaetter"] = ["fotos", "visualisierung"]
+    plan = modell.pruefen(d, FIRMA, basis=tmp_path)
+    erzeugt = pdf.pdf_erzeugen(plan, tmp_path / "plan.pdf")
+    assert [e.kurz for e in erzeugt] == ["visualisierung1", "fotos1"]
+    text = PdfReader(tmp_path / "plan.pdf").pages[0].extract_text()
+    assert "Visualisierung Küche" in text and "salbeigrün" in text and "nicht massstäblich" in text
+
+
+def test_visualisierung_fehlt_oder_heic(tmp_path):
+    d = beispiel()
+    d["visualisierungen"] = [{"vorher": "handy.heic", "nachher": "gibtsnicht.png"}]
+    with pytest.raises(Fehlerhaft) as e:
+        modell.pruefen(d, FIRMA, basis=tmp_path)
+    text = "\n".join(e.value.maengel)
+    assert "visualisierungen[0].vorher 'handy.heic'" in text and "HEIC" in text
+    assert "visualisierungen[0].nachher" in text and "gibtsnicht.png gibt es nicht" in text
+
 # --- IFC ------------------------------------------------------------------
 
 @pytest.fixture(scope="module")

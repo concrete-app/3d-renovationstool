@@ -4,7 +4,7 @@
     python umbauplan.py plan.json ausgabe/ [--blaetter grundriss,schnitte,...]
                         [--entwurf] [--vorschau] [--nur-pruefen]
 
-Die PDF enthält Grundrisse, Schnitte, Ansichten, 3D vorher/nachher und Fotos
+Die PDF enthält Grundrisse, Schnitte, Ansichten, 3D vorher/nachher, Visualisierungen und Fotos
 (was davon, steht in plan.json unter "blaetter" oder in --blaetter).
 
 Braucht ifcopenshell, shapely und matplotlib. Ohne Installation:

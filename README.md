@@ -4,7 +4,7 @@ Skills für Claude, als Plugin-Marketplace. Aufbau wie `concrete-skills`.
 
 | Plugin | Was es tut |
 |---|---|
-| `umbauplan` | Handskizze → Umbau-Plansatz (PDF: Grundriss, Schnitte, Ansichten, 3D vorher/nachher, Fotos; Bestand/Abbruch/Neu) und IFC-Modell |
+| `umbauplan` | Handskizze → Umbau-Plansatz (PDF: Grundriss, Schnitte, Ansichten, 3D vorher/nachher, Visualisierung aus Fotos, Fotos; Bestand/Abbruch/Neu) und IFC-Modell |
 
 ## Installieren (Claude Code)
 
@@ -17,6 +17,24 @@ Lokal, direkt aus diesem Ordner:
 
 Liegt das Repo später auf GitHub: `/plugin marketplace add <github-nutzer>/umbau-skills`.
 
+## Installieren (Codex / ChatGPT)
+
+Codex liest denselben Marketplace (`.claude-plugin/marketplace.json`) und die
+Codex-Angaben in `plugins/umbauplan/.codex-plugin/plugin.json`:
+
+```
+codex plugin marketplace add <github-nutzer>/umbau-skills
+```
+
+In der ChatGPT-Desktop-App erscheint der Marketplace danach unter Plugins, dort
+«Umbauplan» installieren.
+
+**Visualisierungen** (Foto vom Bestand → Bild nach dem Umbau, gleiche Perspektive) macht
+das Bildwerkzeug von ChatGPT/Codex. Es läuft über das ChatGPT-Abo der Person, die das
+Plugin nutzt; ein API-Schlüssel ist nicht nötig. In Claude Code gibt es dieses Werkzeug
+nicht: Dort geht es nur, wenn die Codex CLI installiert und mit ChatGPT angemeldet ist.
+Ablauf und Prompt-Vorlage: `plugins/umbauplan/skills/umbauplan/visualisierung.md`.
+
 ## Aktualisieren
 
 ```
@@ -25,7 +43,8 @@ Liegt das Repo später auf GitHub: `/plugin marketplace add <github-nutzer>/umba
 
 Ein Update kommt nur an, wenn sich `version` in
 `plugins/umbauplan/.claude-plugin/plugin.json` geändert hat. **Bei jeder Änderung die
-Version erhöhen.**
+Version erhöhen**, in beiden Dateien: `.claude-plugin/plugin.json` und
+`.codex-plugin/plugin.json`.
 
 ## Firmenauftritt
 
@@ -47,9 +66,11 @@ IFC macht das Skript. Darum sind die Pläne gleich aufgebaut, und die Masse sind
 ```
 .claude-plugin/marketplace.json                 listet die Plugins auf
 plugins/umbauplan/.claude-plugin/plugin.json    Name und Version
+plugins/umbauplan/.codex-plugin/plugin.json     dasselbe für Codex / ChatGPT
 plugins/umbauplan/skills/umbauplan/
   SKILL.md            Anleitung für Claude (Ablauf, Regeln)
   datenmodell.md      Aufbau von plan.json
+  visualisierung.md   Foto → Bild nach dem Umbau (Prompt-Vorlage)
   firma.json          Firmendaten für den Plankopf
   beispiele/          vollständiges Beispiel
   scripts/
@@ -59,6 +80,7 @@ plugins/umbauplan/skills/umbauplan/
     grundriss.py      Grundriss mit Massketten und Schnittlinien
     ansichten.py      Schnitte und Fassadenansichten
     axonometrie.py    3D vorher/nachher
+    visualisierung.py Blatt Visualisierung vorher/nachher
     fotos.py          Fotodokumentation
     pdf.py            alle Blätter in eine PDF
     ifc_export.py     IFC4 mit Umbaustatus

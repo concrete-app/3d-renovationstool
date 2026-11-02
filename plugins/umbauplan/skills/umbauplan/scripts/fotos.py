@@ -16,7 +16,7 @@ PRO_BLATT = (3, 2)  # Spalten, Zeilen
 MAX_PIXEL = 1600
 
 
-def _laden(datei) -> np.ndarray:
+def bild_laden(datei) -> np.ndarray:
     with Image.open(datei) as bild:
         bild = ImageOps.exif_transpose(bild).convert("RGB")
         bild.thumbnail((MAX_PIXEL, MAX_PIXEL))
@@ -37,7 +37,7 @@ def foto_blaetter(plan: Plan, entwurf: bool = False) -> list[Blatt]:
             sp, ze = i % spalten, i // spalten
             x0, y1 = fx0 + sp * zw + 3, fy1 - ze * zh - 3
             w, h = zw - 6, zh - 14
-            bild = _laden(foto.datei)
+            bild = bild_laden(foto.datei)
             f = min(w / bild.shape[1], h / bild.shape[0])
             bw, bh = bild.shape[1] * f, bild.shape[0] * f
             bx, by = x0 + (w - bw) / 2, y1 - bh

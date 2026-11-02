@@ -22,7 +22,7 @@ OBJEKTTYPEN = ("kueche", "wc", "lavabo", "dusche", "badewanne", "schrank",
                "waschturm", "bett", "tisch", "sofa", "andere")
 ZUSTAENDE = ("beide", "bestand", "neu")
 MASSSTAEBE = (20, 50, 100, 200)
-BLAETTER = ("grundriss", "schnitte", "ansichten", "3d", "fotos")
+BLAETTER = ("grundriss", "schnitte", "ansichten", "3d", "visualisierung", "fotos")
 FOTOFORMATE = (".jpg", ".jpeg", ".png")
 
 PLATZHALTER = re.compile(r"<[^<>]*>|\[[^\[\]]*…[^\[\]]*\]")
@@ -159,6 +159,15 @@ class Foto:
 
 
 @dataclass
+class Visualisierung:
+    """Foto vom Bestand und das Bild, das ChatGPT/Codex daraus in derselben Perspektive gemacht hat."""
+    vorher: Path
+    nachher: Path
+    titel: str
+    wuensche: str
+
+
+@dataclass
 class Plan:
     projekt: Projekt
     geschosse: list[Geschoss]
@@ -166,6 +175,7 @@ class Plan:
     angenommen: list[str]
     schnitte: list[Schnitt] = field(default_factory=list)  # leer: das Skript legt A–A und B–B selbst
     fotos: list[Foto] = field(default_factory=list)
+    visualisierungen: list[Visualisierung] = field(default_factory=list)
     blaetter: tuple[str, ...] = BLAETTER
 
 
@@ -273,6 +283,19 @@ def laden(pfad: str | Path) -> dict:
         return json.loads(Path(pfad).read_text(encoding="utf-8"))
     except json.JSONDecodeError as e:
         raise Fehlerhaft([f"{pfad} ist kein gültiges JSON: {e}"]) from e
+
+
+def _bilddatei(pr: _Pruefer, d: dict, key: str, pfad: str, basis: Path | None) -> Path:
+    """Pfad eines Fotos, relativ zum Ordner von plan.json. Nur JPG und PNG, muss es geben."""
+    datei = Path(pr.text(d, key, pfad))
+    if not datei.is_absolute():
+        datei = (basis or Path.cwd()) / datei
+    if datei.suffix.lower() not in FOTOFORMATE:
+        pr.maengel.append(f"{pfad}.{key} {datei.name!r}: nur JPG und PNG. iPhone-Fotos (HEIC) "
+                          f"umwandeln: sips -s format jpeg bild.heic --out bild.jpg")
+    elif not datei.exists():
+        pr.maengel.append(f"{pfad}.{key} {datei} gibt es nicht")
+    return datei
 
 
 def pruefen(daten: dict, firma: dict | None = None, entwurf: bool = False,
@@ -459,15 +482,20 @@ def pruefen(daten: dict, firma: dict | None = None, entwurf: bool = False,
         if not isinstance(fo, dict):
             pr.maengel.append(f"{fp} muss ein Objekt sein")
             continue
-        datei = Path(pr.text(fo, "datei", fp))
-        if not datei.is_absolute():
-            datei = (basis or Path.cwd()) / datei
-        if datei.suffix.lower() not in FOTOFORMATE:
-            pr.maengel.append(f"{fp}.datei {datei.name!r}: nur JPG und PNG. iPhone-Fotos (HEIC) "
-                              f"umwandeln: sips -s format jpeg bild.heic --out bild.jpg")
-        elif not datei.exists():
-            pr.maengel.append(f"{fp}.datei {datei} gibt es nicht")
-        fotos.append(Foto(datei=datei, titel=pr.text(fo, "titel", fp, pflicht=False)))
+        fotos.append(Foto(datei=_bilddatei(pr, fo, "datei", fp, basis),
+                          titel=pr.text(fo, "titel", fp, pflicht=False)))
+
+    visualisierungen = []
+    for vi, vo in enumerate(pr.liste(daten, "visualisierungen", "")):
+        vp = f"visualisierungen[{vi}]"
+        if not isinstance(vo, dict):
+            pr.maengel.append(f"{vp} muss ein Objekt sein")
+            continue
+        visualisierungen.append(Visualisierung(
+            vorher=_bilddatei(pr, vo, "vorher", vp, basis),
+            nachher=_bilddatei(pr, vo, "nachher", vp, basis),
+            titel=pr.text(vo, "titel", vp, pflicht=False),
+            wuensche=pr.text(vo, "wuensche", vp, pflicht=False)))
 
     blaetter = daten.get("blaetter", list(BLAETTER))
     if not isinstance(blaetter, list) or not blaetter or any(b not in BLAETTER for b in blaetter):
@@ -481,4 +509,5 @@ def pruefen(daten: dict, firma: dict | None = None, entwurf: bool = False,
     if pr.maengel:
         raise Fehlerhaft(pr.maengel)
     return Plan(projekt=projekt, geschosse=geschosse, firma=firma, angenommen=angenommen,
-                schnitte=schnitte, fotos=fotos, blaetter=tuple(b for b in BLAETTER if b in blaetter))
+                schnitte=schnitte, fotos=fotos,
+                visualisierungen=visualisierungen, blaetter=tuple(b for b in BLAETTER if b in blaetter))

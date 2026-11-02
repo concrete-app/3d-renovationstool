@@ -133,10 +133,22 @@ setze einen eigenen Punkt mit `zustand: "neu"` und gib den alten Räumen `zustan
 ```
 Pfad relativ zum Ordner von `plan.json`. Nur JPG und PNG.
 
+## visualisierungen[] (oben, optional)
+
+```json
+"visualisierungen": [
+  { "vorher": "fotos/kueche.jpg", "nachher": "visualisierungen/kueche_neu.png",
+    "titel": "Küche", "wuensche": "Fronten salbeigrün matt, Eiche, Arbeitsplatte Terrazzo" }
+]
+```
+`vorher` ist das Foto vom Bestand, `nachher` das Bild aus dem Bildwerkzeug (siehe
+`visualisierung.md`). Pfade relativ zum Ordner von `plan.json`, nur JPG und PNG.
+`titel` und `wuensche` sind optional und stehen auf dem Blatt.
+
 ## blaetter (oben, optional)
 
 Welche Blätter in die PDF kommen, Standard alle:
-`["grundriss", "schnitte", "ansichten", "3d", "fotos"]`.
+`["grundriss", "schnitte", "ansichten", "3d", "visualisierung", "fotos"]`.
 
 ## angenommen[] (oben, neben projekt)
 

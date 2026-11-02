@@ -8,7 +8,7 @@
     {
       "name": "umbauplan",
       "source": "./plugins/umbauplan",
-      "description": "Macht aus Handskizzen einen Umbau-Plansatz (PDF: Grundriss, Schnitte, Ansichten, 3D vorher/nachher, Fotos; Bestand/Abbruch/Neu) und ein IFC-Modell."
+      "description": "Macht aus Handskizzen einen Umbau-Plansatz (PDF: Grundriss, Schnitte, Ansichten, 3D vorher/nachher, Visualisierung aus Fotos, Fotos; Bestand/Abbruch/Neu) und ein IFC-Modell."
     }
   ]
 }

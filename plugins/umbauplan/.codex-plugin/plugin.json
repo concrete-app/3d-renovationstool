@@ -1,0 +1,18 @@
+{
+  "name": "umbauplan",
+  "version": "0.4.0",
+  "description": "Macht aus Handskizzen einen Umbau-Plansatz (PDF: Grundriss, Schnitte, Ansichten, 3D vorher/nachher, Visualisierung aus Fotos, Fotos; Bestand/Abbruch/Neu) und ein IFC-Modell.",
+  "author": { "name": "AKUBA GmbH | das-umbau-team.ch" },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Umbauplan",
+    "shortDescription": "Skizze und Fotos → Umbau-Plansatz, IFC und Visualisierung",
+    "developerName": "AKUBA GmbH | das-umbau-team.ch",
+    "category": "Productivity",
+    "websiteURL": "https://das-umbau-team.ch",
+    "defaultPrompt": [
+      "Mach aus dieser Skizze einen Umbauplan.",
+      "Zeig mir diese Küche nach dem Umbau, gleiche Perspektive, Fronten salbeigrün."
+    ]
+  }
+}

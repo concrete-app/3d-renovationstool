@@ -1,6 +1,6 @@
 ---
 name: umbauplan
-description: Macht bei Küchen-, Bad- und Gesamtrenovationen aus Handskizzen, Masstexten, Fotos oder einem alten Plan einen massstäblichen Umbau-Plansatz als PDF (Grundriss, Schnitte, Ansichten, 3D vorher/nachher, Fotodokumentation; Bestand schwarz, Abbruch gelb, Neu rot, mit Plankopf) und ein IFC-Modell. Verwenden, wenn jemand einen Grundriss, Umbauplan, Schnitt, eine Ansicht, 3D-Ansicht, Visualisierung oder ein IFC/BIM-Modell aus einer Skizze will.
+description: Macht bei Küchen-, Bad- und Gesamtrenovationen aus Handskizzen, Masstexten, Fotos oder einem alten Plan einen massstäblichen Umbau-Plansatz als PDF (Grundriss, Schnitte, Ansichten, 3D vorher/nachher, Fotodokumentation; Bestand schwarz, Abbruch gelb, Neu rot, mit Plankopf) und ein IFC-Modell. Macht aus Fotos vom Bestand Visualisierungen nach dem Umbau in derselben Perspektive (Bildwerkzeug von ChatGPT/Codex). Verwenden, wenn jemand einen Grundriss, Umbauplan, Schnitt, eine Ansicht, 3D-Ansicht, Visualisierung oder ein IFC/BIM-Modell aus einer Skizze will, oder ein Foto anhängt und sehen will, wie der Raum modern oder nach dem Umbau aussieht.
 ---
 
 # Umbauplan: Skizze → Plansatz (PDF) + IFC
@@ -109,6 +109,17 @@ Leitungen). Sollen sie in den Plansatz, trage sie in `plan.json` unter `fotos` e
 umwandeln mit `sips -s format jpeg bild.heic --out bild.jpg`. Lies jedes Foto vorher an,
 bevor du es in den Plan setzt, und frage, wenn darauf Personen oder Privates zu sehen sind.
 
+## Visualisierung aus Fotos
+
+Hängt die Person ein Foto an und will sehen, wie der Raum nach dem Umbau aussieht
+(«mach das modern», «wie sieht die neue Küche aus», «Fronten in Salbeigrün»), erzeugst du
+mit dem Bildwerkzeug von ChatGPT/Codex ein neues Bild aus **derselben Perspektive**: das
+Foto als Eingabebild, neue Einrichtung nach Plan, Farben und Materialien nach den Wünschen
+der Person. **Lies vorher `visualisierung.md`**: Prompt-Vorlage, Ablage der Bilder und was
+zu tun ist, wenn es kein Bildwerkzeug gibt. Foto und Bild trägst du unter
+`visualisierungen` in `plan.json` ein; sie kommen als Blatt «Visualisierung vorher/nachher»
+in den Plansatz.
+
 ## Was das Skript erzeugt
 
 - `<plannummer>_umbau.pdf`, ein Plansatz auf A3, Blätter in dieser Reihenfolge:
@@ -129,7 +140,10 @@ bevor du es in den Plan setzt, und frage, wenn darauf Personen oder Privates zu 
   3. **Ansichten** der vier Fassaden, mit Himmelsrichtung, wenn `nordwinkel` angegeben ist.
   4. **3D vorher/nachher** je Geschoss, aus zwei Blickwinkeln: Puppenhaus ohne Decke, vorher
      gelb was wegkommt, nachher rot was neu ist.
-  5. **Fotodokumentation**, wenn `fotos` angegeben sind.
+  5. **Visualisierung** vorher/nachher, ein Blatt pro Eintrag in `visualisierungen`: Foto
+     links, Bild nach dem Umbau rechts, darunter die Wünsche der Person und der Hinweis
+     «nicht massstäblich».
+  6. **Fotodokumentation**, wenn `fotos` angegeben sind.
 
   Plankopf mit Logo und Firmendaten aus `firma.json` (das-umbau-team.ch) auf jedem Blatt.
   Nur einzelne Blätter: `--blaetter grundriss,3d` oder `"blaetter"` in `plan.json`.
@@ -149,8 +163,9 @@ und sage der Person, dass sie das Skript auf einem Rechner mit Python ausführen
 
 - Kein Dach, kein Terrain, keine Treppen: Ansichten zeigen die Wände bis zur Decke.
   Schnitte sind senkrecht zu x oder y (keine schrägen Schnitte).
-- Keine fotorealistischen Bilder. Die 3D-Ansicht ist eine Planskizze für das Gespräch
-  mit der Bauherrschaft, kein Rendering.
+- Fotorealistische Bilder nur über das Bildwerkzeug von ChatGPT/Codex (siehe
+  `visualisierung.md`), nie selbst gezeichnet. Sie sind nicht massstäblich. Die 3D-Ansicht
+  ist eine Planskizze für das Gespräch mit der Bauherrschaft, kein Rendering.
 - Keine schrägen Aussenmassketten: Bemasst werden Fassaden, die parallel zu x oder y
   liegen. Schräge Wände werden gezeichnet, aber nicht aussen bemasst.
 - Keine Statik, keine Baubewilligungs-Pläne. Ob eine Wand tragend ist, entscheidet eine

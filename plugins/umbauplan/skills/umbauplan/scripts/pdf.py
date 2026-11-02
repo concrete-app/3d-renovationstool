@@ -1,7 +1,7 @@
 """Setzt alle Blätter zu einer PDF zusammen.
 
 Reihenfolge: Grundrisse (je Geschoss), Schnitte, Ansichten, 3D (je Geschoss,
-zwei Blickwinkel), Fotos. Welche Blätter es gibt, steht in plan.blaetter.
+zwei Blickwinkel), Visualisierungen, Fotos. Welche Blätter es gibt, steht in plan.blaetter.
 """
 
 from __future__ import annotations
@@ -16,6 +16,7 @@ import ansichten
 import axonometrie
 import fotos
 import grundriss
+import visualisierung
 from blatt import schrift_setzen
 from modell import Plan
 
@@ -52,6 +53,10 @@ def pdf_erzeugen(plan: Plan, ziel: Path, entwurf: bool = False,
                     blatt = axonometrie.blatt_3d(plan, g, az, entwurf)
                     yield blatt, Erzeugt(f"3d_{g.id}_{int(az)}", f"3D {g.name} vorher/nachher ({int(az)}°)",
                                          "ohne")
+        if "visualisierung" in plan.blaetter:
+            for i, blatt in enumerate(visualisierung.visualisierung_blaetter(plan, entwurf)):
+                titel = plan.visualisierungen[i].titel
+                yield blatt, Erzeugt(f"visualisierung{i + 1}", f"Visualisierung {titel}".strip(), "–")
         if "fotos" in plan.blaetter and plan.fotos:
             for i, blatt in enumerate(fotos.foto_blaetter(plan, entwurf)):
                 yield blatt, Erzeugt(f"fotos{i + 1}", "Fotodokumentation", "–")
