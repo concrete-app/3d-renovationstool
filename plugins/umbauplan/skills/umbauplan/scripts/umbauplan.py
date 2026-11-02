@@ -24,6 +24,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+from dataclasses import dataclass, field
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -34,6 +35,35 @@ from modell import BLAETTER, Fehlerhaft, laden, mass_text, pruefen  # noqa: E402
 
 def dateiname(text: str) -> str:
     return re.sub(r"[^A-Za-z0-9._-]+", "-", text).strip("-") or "plan"
+
+
+@dataclass
+class Ergebnis:
+    pdf: Path
+    ifc: Path | None                               # None: ifcopenshell fehlt
+    blaetter: list = field(default_factory=list)   # pdf.Erzeugt je Blatt
+    vorschauen: list[Path] = field(default_factory=list)
+
+
+def erzeugen(plan, ausgabe: Path, entwurf: bool = False, vorschau: bool = False) -> Ergebnis:
+    """Schreibt PDF, IFC (wenn ifcopenshell da ist) und auf Wunsch die Vorschau-PNGs."""
+    from pdf import pdf_erzeugen                   # erst hier: matplotlib ist langsam zu laden
+    try:
+        from ifc_export import ifc_erzeugen
+    except ImportError:                            # z. B. ChatGPT-Sandbox ohne ifcopenshell
+        ifc_erzeugen = None
+
+    ausgabe.mkdir(parents=True, exist_ok=True)
+    stamm = dateiname(plan.projekt.plannummer)
+    pdf = ausgabe / f"{stamm}_umbau.pdf"
+    png = ausgabe / f"{stamm}_vorschau.png" if vorschau else None
+    blaetter = pdf_erzeugen(plan, pdf, entwurf=entwurf, vorschau=png)
+    ifc = None
+    if ifc_erzeugen:
+        ifc = ausgabe / f"{stamm}.ifc"
+        ifc_erzeugen(plan, ifc)
+    vorschauen = [png.with_name(f"{png.stem}_{b.kurz}.png") for b in blaetter] if png else []
+    return Ergebnis(pdf=pdf, ifc=ifc, blaetter=blaetter, vorschauen=vorschauen)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -84,40 +114,27 @@ def main(argv: list[str] | None = None) -> int:
     if args.nur_pruefen:
         return 0
 
-    from pdf import pdf_erzeugen                   # erst hier: matplotlib ist langsam zu laden
     try:
-        from ifc_export import ifc_erzeugen
-    except ImportError:                            # z. B. ChatGPT-Sandbox ohne ifcopenshell
-        ifc_erzeugen = None
-
-    try:
-        args.ausgabe.mkdir(parents=True, exist_ok=True)
-        stamm = dateiname(plan.projekt.plannummer)
-        pdf = args.ausgabe / f"{stamm}_umbau.pdf"
-        ifc = args.ausgabe / f"{stamm}.ifc"
-        vorschau = args.ausgabe / f"{stamm}_vorschau.png" if args.vorschau else None
-        blaetter = pdf_erzeugen(plan, pdf, entwurf=args.entwurf, vorschau=vorschau)
-        if ifc_erzeugen:
-            ifc_erzeugen(plan, ifc)
+        erg = erzeugen(plan, args.ausgabe, entwurf=args.entwurf, vorschau=args.vorschau)
     except Fehlerhaft as e:
         print("\nMÄNGEL beim Zeichnen:")
         for mangel in e.maengel:
             print(f"  - {mangel}")
         return 1
 
-    print(f"\nErzeugt: {pdf} ({len(blaetter)} Blätter)")
+    print(f"\nErzeugt: {erg.pdf} ({len(erg.blaetter)} Blätter)")
     wunsch = f"1:{plan.projekt.massstab}"
-    for i, b in enumerate(blaetter, 1):
+    for i, b in enumerate(erg.blaetter, 1):
         hinweis = f" ({wunsch} passte nicht auf A3)" if b.massstab.startswith("1:") and b.massstab != wunsch else ""
         print(f"  {i:2}. {b.inhalt}, {b.massstab}{hinweis}")
-    if ifc_erzeugen:
-        print(f"  {ifc}")
+    if erg.ifc:
+        print(f"  {erg.ifc}")
     else:
         print("  KEIN IFC: ifcopenshell fehlt (pip install ifcopenshell). Die PDF ist vollständig.")
-    if vorschau:
+    if erg.vorschauen:
         print("Vorschau:")
-        for b in blaetter:
-            print(f"  {vorschau.with_name(f'{vorschau.stem}_{b.kurz}.png')}")
+        for v in erg.vorschauen:
+            print(f"  {v}")
     if args.entwurf:
         print("\nENTWURF: nicht als fertig weitergeben.")
     return 0

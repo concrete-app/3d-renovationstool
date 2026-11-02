@@ -451,6 +451,26 @@ def test_visualisierung_fehlt_oder_heic(tmp_path):
     assert "visualisierungen[0].vorher 'handy.heic'" in text and "HEIC" in text
     assert "visualisierungen[0].nachher" in text and "gibtsnicht.png gibt es nicht" in text
 
+
+# --- Badbeispiel und Selbsttest -------------------------------------------
+
+def test_bad_beispiel_gueltig_ohne_warnungen():
+    d = json.loads((SKILL / "beispiele" / "bad.json").read_text(encoding="utf-8"))
+    plan = pruefen(d)
+    assert [w for g in plan.geschosse for w in geometrie.warnungen(g)] == []
+    bad = {r.name: r for r in geometrie.raeume(plan.geschosse[0], "neu")}["Bad"]
+    assert bad.m2 > {r.name: r for r in geometrie.raeume(plan.geschosse[0], "bestand")}["Bad"].m2
+
+
+def test_selbsttest_gesamtlauf(tmp_path, capsys):
+    pytest.importorskip("ifcopenshell")
+    pytest.importorskip("pypdf")
+    import selbsttest
+    assert selbsttest.main([str(tmp_path)]) == 0
+    ausgabe = capsys.readouterr().out
+    assert "FEHLT" not in ausgabe and "PDF hat 6 Seiten" in ausgabe
+    assert (tmp_path / "B-002_umbau.pdf").is_file() and (tmp_path / "B-002.ifc").is_file()
+
 # --- IFC ------------------------------------------------------------------
 
 @pytest.fixture(scope="module")

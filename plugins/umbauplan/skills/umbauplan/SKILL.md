@@ -8,7 +8,8 @@ description: Macht bei Küchen-, Bad- und Gesamtrenovationen aus Handskizzen, Ma
 Du liest die Skizze und schreibst `plan.json`. **Zeichnen, Rechnen und Prüfen
 macht das Skript**, du zeichnest nie selbst (kein matplotlib, kein SVG von Hand).
 Darum sieht jeder Plan gleich aus, und die Masse sind exakt. Das Datenmodell steht in
-`datenmodell.md` (zuerst lesen), ein vollständiges Beispiel in `beispiele/wohnung.json`.
+`datenmodell.md` (zuerst lesen), vollständige Beispiele in `beispiele/wohnung.json`
+(Wohnung) und `beispiele/bad.json` (Badumbau).
 
 `<skill>` ist unten der Ordner, in dem diese SKILL.md liegt. Der Skill läuft im
 **Claude-Chat** und im **ChatGPT-Chat**; was dabei verschieden ist, steht unter
@@ -57,10 +58,26 @@ diesem Sinn:
 - **Status ist Pflicht.** Für jede Wand und Öffnung: bleibt (`bestand`), fällt weg
   (`abbruch`) oder kommt dazu (`neu`). Ist es auf der Skizze nicht klar (Farbe,
   Schraffur, Kreuz, Notiz), frage.
+- **Die PDF entsteht nur mit `scripts/umbauplan.py`.** Kein ReportLab, kein eigener
+  matplotlib-Code, keine Ersatz-PDF, auch nicht «vereinfacht» oder «vorläufig». Läuft das
+  Skript nicht, zeig der Person die Fehlermeldung wörtlich und sag, was fehlt.
+- **Nur melden, was es gibt.** Nenne eine Datei erst, wenn du sie mit `ls` gesehen hast.
 - **Platzhalter sind ein Mangel.** Ohne `--entwurf` lehnt das Skript `<…>` in Projekt
   oder `firma.json` ab. Eine Plannummer denkst du dir nicht aus.
 
 ## Ablauf
+
+**Zuerst, einmal pro Unterhaltung: Selbsttest.**
+
+```
+python <skill>/scripts/selbsttest.py
+```
+
+Er prüft Bibliotheken, Skill-Ordner, Firmendaten, Logo und Schrift und erzeugt mit dem
+Originalskript einen Beispiel-Plansatz (Badumbau, 6 Seiten A3) samt Prüfung. Steht am Ende
+`ERGEBNIS: … läuft`, geht es weiter. Steht irgendwo `FEHLT`, melde der Person genau diese
+Zeilen und hör auf; baue keinen Ersatz. `HINWEIS` (z. B. kein IFC ohne ifcopenshell) sagst
+du ihr und machst weiter.
 
 1. **Skizze lesen.** Liste für dich: Aussenwände, Innenwände mit Dicke, Türen und
    Fenster mit Lage und Breite, Raumnamen, Küchen- und Sanitäreinrichtung (alt und neu),
@@ -160,7 +177,7 @@ Du musst das Skript **selbst ausführen**, mit deinem Python-Werkzeug (Codeausf�
 du nie selbst nach. Das Skript braucht shapely, matplotlib, numpy und Pillow; für das IFC
 zusätzlich ifcopenshell. Fehlt nur ifcopenshell, entsteht die PDF trotzdem, ohne IFC.
 
-1. **Bibliotheken prüfen:** `python -c "import shapely, matplotlib, numpy, PIL"`. Fehlt etwas:
+1. **Bibliotheken prüfen:** macht der Selbsttest (siehe Ablauf). Fehlt etwas:
    `pip install shapely matplotlib pillow ifcopenshell`. Hast du kein Internet (ChatGPT),
    geht das nicht; ifcopenshell fehlt dann, das ist in Ordnung.
 2. **Skill-Ordner finden:** Such die Datei `scripts/umbauplan.py` neben dieser SKILL.md im
@@ -173,7 +190,10 @@ zusätzlich ifcopenshell. Fehlt nur ifcopenshell, entsteht die PDF trotzdem, ohn
    unverändert dorthin, z. B. nach `/mnt/data/umbauplan/` (Textdateien Zeichen für Zeichen,
    `assets/` mit Logo und Schrift dazu), und starte das Skript von dort. Klappt auch das nicht,
    sag der Person genau, was fehlt, und gib ihr `plan.json`. Erfinde keinen Plan.
-4. **Ergebnis abgeben:** PDF (und IFC) als Datei zum Herunterladen, Vorschau-PNGs vorher selbst
+   Ob ChatGPT die Plugin-Dateien in die Python-Umgebung legt, entscheidet ChatGPT; der
+   Selbsttest zeigt es.
+4. **Ergebnis abgeben:** PDF (und IFC) als Datei zum Herunterladen (ChatGPT: Link auf
+   `/mnt/data/...`; Claude: Datei in `/mnt/user-data/outputs/`). Vorschau-PNGs vorher selbst
    ansehen (Ablauf, Schritt 6).
 
 `uv` ist optional: Gibt es `uv` (eigener Rechner), geht es ohne Installation mit

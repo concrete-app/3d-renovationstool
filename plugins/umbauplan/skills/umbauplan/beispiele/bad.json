@@ -1,0 +1,57 @@
+{
+  "projekt": {
+    "name": "Beispiel: Badumbau, Wanne wird Dusche",
+    "adresse": "Musterstrasse 5, 8000 Zürich",
+    "bauherr": "Beispiel",
+    "plannummer": "B-002",
+    "datum": "2026-11-02",
+    "gezeichnet": "umbauplan",
+    "index": "A",
+    "massstab": 50,
+    "nordwinkel": 0
+  },
+  "geschosse": [
+    {
+      "id": "OG",
+      "name": "Obergeschoss",
+      "kote": 280,
+      "raumhoehe": 250,
+      "deckenstaerke": 20,
+      "waende": [
+        { "id": "W1", "von": [0, 0], "bis": [600, 0], "dicke": 30, "status": "bestand" },
+        { "id": "W2", "von": [600, 0], "bis": [600, 450], "dicke": 30, "status": "bestand" },
+        { "id": "W3", "von": [600, 450], "bis": [0, 450], "dicke": 30, "status": "bestand" },
+        { "id": "W4", "von": [0, 450], "bis": [0, 0], "dicke": 30, "status": "bestand" },
+        { "id": "W5", "von": [0, 300], "bis": [600, 300], "dicke": 12, "status": "bestand" },
+        { "id": "W6", "von": [250, 0], "bis": [250, 300], "dicke": 10, "status": "abbruch" },
+        { "id": "W7", "von": [310, 0], "bis": [310, 300], "dicke": 10, "status": "neu" }
+      ],
+      "oeffnungen": [
+        { "id": "F1", "wand": "W1", "typ": "fenster", "abstand": 90, "breite": 80, "hoehe": 100, "bruestung": 120, "status": "bestand" },
+        { "id": "F2", "wand": "W1", "typ": "fenster", "abstand": 400, "breite": 120, "hoehe": 140, "bruestung": 90, "status": "bestand" },
+        { "id": "T1", "wand": "W5", "typ": "tuer", "abstand": 110, "breite": 70, "hoehe": 200, "status": "abbruch", "anschlag": "anfang", "seite": "rechts" },
+        { "id": "T2", "wand": "W5", "typ": "tuer", "abstand": 210, "breite": 80, "hoehe": 210, "status": "neu", "anschlag": "ende", "seite": "rechts" },
+        { "id": "T3", "wand": "W5", "typ": "tuer", "abstand": 420, "breite": 90, "hoehe": 210, "status": "bestand", "anschlag": "ende", "seite": "rechts" },
+        { "id": "T4", "wand": "W2", "typ": "tuer", "abstand": 330, "breite": 100, "hoehe": 210, "status": "bestand", "anschlag": "ende", "seite": "links" }
+      ],
+      "raeume": [
+        { "name": "Bad", "punkt": [120, 150] },
+        { "name": "Zimmer", "punkt": [470, 150] },
+        { "name": "Korridor", "punkt": [300, 375] }
+      ],
+      "objekte": [
+        { "typ": "badewanne", "position": [52.5, 105], "breite": 170, "tiefe": 75, "rotation": 270, "status": "abbruch" },
+        { "typ": "dusche", "position": [60, 80], "breite": 120, "tiefe": 90, "rotation": 270, "status": "neu" },
+        { "typ": "wc", "position": [60, 264], "breite": 40, "tiefe": 60, "rotation": 180, "status": "bestand" },
+        { "typ": "lavabo", "position": [222.5, 150], "breite": 60, "tiefe": 45, "rotation": 90, "status": "abbruch" },
+        { "typ": "lavabo", "position": [282.5, 110], "breite": 100, "tiefe": 45, "rotation": 90, "status": "neu", "bezeichnung": "Doppel-WT" },
+        { "typ": "bett", "position": [485, 115], "breite": 160, "tiefe": 200, "rotation": 90, "status": "bestand" }
+      ]
+    }
+  ],
+  "angenommen": [
+    "Alle Masse sind Beispielmasse, nicht gemessen",
+    "Raumhöhe 2.50 (Standardwert)",
+    "Aussenwände 30, Innenwände 10 und 12 (Standardwerte)"
+  ]
+}

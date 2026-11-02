@@ -31,6 +31,35 @@ wieder angehängt. Ablauf und Prompt-Vorlage: `plugins/umbauplan/skills/umbaupla
 **Im ChatGPT-Chat** hat die Python-Umgebung kein Internet. matplotlib, shapely, numpy und
 Pillow sind dort normalerweise vorhanden, ifcopenshell nicht: Es entsteht dann die PDF ohne IFC.
 
+## So rufen ChatGPT und Claude das Plugin auf
+
+1. **Selbsttest**, einmal pro Unterhaltung, mit dem Python-Werkzeug des Chats:
+   `python <skill>/scripts/selbsttest.py`. Er erzeugt mit dem Originalskript den Plansatz für
+   `beispiele/bad.json` (6 Seiten A3 + IFC) und prüft ihn. `FEHLT` nennt die Ursache
+   (Bibliothek, Skill-Ordner, Firmendaten, Logo, Schrift, Schreibrechte); dann bricht der
+   Chat ab, statt eine Ersatz-PDF zu bauen.
+2. **plan.json schreiben** aus Skizze, Fotos, Massen (Datenmodell: `datenmodell.md`).
+3. **Erzeugen:** `python <skill>/scripts/umbauplan.py plan.json <ausgabe> --vorschau`
+   (ChatGPT: Ausgabe unter `/mnt/data/`, Claude: `/mnt/user-data/outputs/`).
+4. **Vorschau-PNGs ansehen**, dann PDF und IFC zum Herunterladen abgeben.
+
+`<skill>` ist der Ordner mit `SKILL.md`. Findet der Chat die Skripte nicht in seiner
+Python-Umgebung, sagt der Selbsttest das; der Ordner muss dann vollständig dorthin kopiert werden.
+
+## Abhängigkeiten
+
+| Paket | getestet mit | nötig für |
+|---|---|---|
+| Python | 3.12 | (3.10 bis 3.13) |
+| shapely | 2.2.0 | Geometrie, Räume, Flächen |
+| matplotlib | 3.11.2 | alle Blätter, PDF |
+| numpy | 2.5.4 | 3D, Bilder |
+| pillow | 12.3.0 | Fotos, Logo |
+| ifcopenshell | 0.9.0 | IFC (optional: fehlt es, entsteht nur die PDF) |
+| pypdf | 6.20.1 | nur Selbsttest und Tests (Textprüfung der PDF) |
+
+Im ChatGPT-Chat gibt es kein Internet: ifcopenshell lässt sich dort nicht nachladen.
+
 ## Aktualisieren
 
 ```
@@ -69,7 +98,7 @@ plugins/umbauplan/skills/umbauplan/
   datenmodell.md      Aufbau von plan.json
   visualisierung.md   Foto → Bild nach dem Umbau (Prompt-Vorlage)
   firma.json          Firmendaten für den Plankopf
-  beispiele/          vollständiges Beispiel
+  beispiele/          vollständige Beispiele (wohnung.json, bad.json)
   scripts/
     modell.py         plan.json lesen und prüfen
     geometrie.py      Wandflächen nach Status, Räume, Flächen
@@ -82,6 +111,7 @@ plugins/umbauplan/skills/umbauplan/
     pdf.py            alle Blätter in eine PDF
     ifc_export.py     IFC4 mit Umbaustatus
     umbauplan.py      Kommandozeile
+    selbsttest.py     prüft Umgebung und erzeugt den Beispiel-Plansatz
 tests/                Tests für die Skripte
 ```
 
