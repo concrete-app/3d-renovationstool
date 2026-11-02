@@ -1,29 +1,32 @@
 # Visualisierung: Foto vom Bestand → Bild nach dem Umbau, gleiche Perspektive
 
 Die Person hängt ein Foto an (z. B. die alte Küche) und will sehen, wie es nach dem
-Umbau aussieht. Du erzeugst daraus mit dem **Bildwerkzeug von ChatGPT/Codex** ein neues
+Umbau aussieht. Du erzeugst daraus mit der **Bildgenerierung von ChatGPT** ein neues
 Bild aus **genau demselben Blickwinkel**, mit neuer Einrichtung nach Plan und den Farb-
 und Materialwünschen der Person. Das Bild läuft über das ChatGPT-Abo der Person, ein
-API-Schlüssel ist nicht nötig. Das Skript zeichnet nichts davon, es setzt Foto und Bild
-nur als Blatt «Visualisierung» in den Plansatz.
+API-Schlüssel ist nicht nötig. Im Claude-Chat gibt es keine Bildgenerierung, siehe unten.
+Das Skript zeichnet nichts davon, es setzt Foto und Bild nur als Blatt «Visualisierung»
+in den Plansatz.
 
 ## Ablauf
 
 1. **Foto ansehen.** Was zeigt es (Raum, Blickrichtung, Fenster, Türen, Einrichtung)?
    Personen oder Privates darauf: zuerst fragen. HEIC vorher umwandeln:
    `sips -s format jpeg bild.heic --out bild.jpg`. Das Foto gehört in den Arbeitsordner
-   neben `plan.json`, z. B. `fotos/kueche.jpg`.
+   neben `plan.json`, z. B. `/mnt/data/fotos/kueche.jpg` (angehängte Dateien liegen in
+   ChatGPT schon in `/mnt/data/`).
 2. **Was ändert sich?** Gibt es schon `plan.json`, nimm aus dem Raum, den das Foto zeigt,
    die Objekte und Wände mit Status `abbruch` (verschwindet) und `neu` (kommt dazu).
    Sonst nimm, was die Person sagt. Fehlt Wichtiges (Wanne raus oder bleibt sie?), frage
    einmal knapp nach. Farben, Materialien und Stil aus der Nachricht der Person übernimmst
    du wörtlich in den Prompt.
-3. **Prompt nach der Vorlage unten schreiben** und das Bildwerkzeug aufrufen, **mit dem
-   Foto als Eingabebild** (bearbeiten, nicht ein neues Bild ohne Vorlage erfinden).
-   Ohne das Foto als Eingabe stimmt die Perspektive nie.
-4. **Speichern** als `visualisierungen/<raum>_neu.png` neben `plan.json`. In Codex legt das
-   Werkzeug die Bilder zuerst unter `$CODEX_HOME/generated_images/` ab (Standard
-   `~/.codex/generated_images/`); nimm dort die neueste Datei und kopiere sie.
+3. **Prompt nach der Vorlage unten schreiben** und die Bildgenerierung aufrufen, **mit dem
+   angehängten Foto als Vorlage** (das Foto bearbeiten, nicht ein neues Bild ohne Vorlage
+   erfinden). Ohne das Foto als Vorlage stimmt die Perspektive nie.
+4. **Ins PDF bringen:** Das erzeugte Bild muss als Datei in deiner Python-Umgebung liegen,
+   z. B. `/mnt/data/visualisierungen/kueche_neu.png`. Schau mit `ls /mnt/data` nach, ob es
+   dort ist. Wenn nicht: bitte die Person, das Bild herunterzuladen und hier wieder
+   anzuhängen; dann liegt es in `/mnt/data/`.
 5. **Prüfen:** Foto und Bild nebeneinander ansehen. Stimmen Standpunkt, Fluchtpunkte,
    Fenster, Türen und Deckenhöhe? Wenn nicht, ein zweites Mal erzeugen und im Prompt
    genau sagen, was verrutscht ist («the window must stay on the left wall, same size»).
@@ -70,20 +73,16 @@ materials and proportions, no people, no text, no logos, no watermark, no extra 
 or doors.
 ```
 
-## Wenn kein Bildwerkzeug da ist
+## Im Claude-Chat
 
-Manche Umgebungen (z. B. Claude Code) haben kein Bildwerkzeug. Dann:
+Claude kann keine Bilder erzeugen. Dann:
 
-- Ist die Codex CLI installiert und mit ChatGPT angemeldet (`codex login`), erzeuge das Bild
-  darüber, mit dem Foto als Eingabe:
+1. Schreib den Prompt nach der Vorlage fertig aus (mit Abbruch, Neu und Wünschen).
+2. Gib ihn der Person in einem Codeblock und sag ihr: «In ChatGPT das Foto anhängen, diesen
+   Text einfügen, das Bild herunterladen und hier wieder anhängen.»
+3. Kommt das Bild zurück, trag es unter `visualisierungen` ein und erzeuge den Plansatz neu.
 
-  ```
-  codex exec -i fotos/kueche.jpg '$imagegen <Prompt nach der Vorlage>. Save the result as visualisierungen/kueche_neu.png'
-  ```
-  Liegt das Bild danach nicht dort, nimm die neueste Datei aus `~/.codex/generated_images/`.
-- Sonst sag der Person, dass Visualisierungen ChatGPT/Codex brauchen, gib ihr den fertigen
-  Prompt zum Kopieren und erzeuge den Plansatz ohne Visualisierung. Erfinde kein Bild und
-  zeichne keins mit matplotlib.
+Erfinde kein Bild und zeichne keins mit matplotlib.
 
 ## Was eine Visualisierung ist und was nicht
 

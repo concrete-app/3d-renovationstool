@@ -1,6 +1,6 @@
 ---
 name: umbauplan
-description: Macht bei Küchen-, Bad- und Gesamtrenovationen aus Handskizzen, Masstexten, Fotos oder einem alten Plan einen massstäblichen Umbau-Plansatz als PDF (Grundriss, Schnitte, Ansichten, 3D vorher/nachher, Fotodokumentation; Bestand schwarz, Abbruch gelb, Neu rot, mit Plankopf) und ein IFC-Modell. Macht aus Fotos vom Bestand Visualisierungen nach dem Umbau in derselben Perspektive (Bildwerkzeug von ChatGPT/Codex). Verwenden, wenn jemand einen Grundriss, Umbauplan, Schnitt, eine Ansicht, 3D-Ansicht, Visualisierung oder ein IFC/BIM-Modell aus einer Skizze will, oder ein Foto anhängt und sehen will, wie der Raum modern oder nach dem Umbau aussieht.
+description: Macht bei Küchen-, Bad- und Gesamtrenovationen aus Handskizzen, Masstexten, Fotos oder einem alten Plan einen massstäblichen Umbau-Plansatz als PDF (Grundriss, Schnitte, Ansichten, 3D vorher/nachher, Fotodokumentation; Bestand schwarz, Abbruch gelb, Neu rot, mit Plankopf) und ein IFC-Modell. Macht aus Fotos vom Bestand Visualisierungen nach dem Umbau in derselben Perspektive (Bildgenerierung von ChatGPT). Verwenden, wenn jemand einen Grundriss, Umbauplan, Schnitt, eine Ansicht, 3D-Ansicht, Visualisierung oder ein IFC/BIM-Modell aus einer Skizze will, oder ein Foto anhängt und sehen will, wie der Raum modern oder nach dem Umbau aussieht.
 ---
 
 # Umbauplan: Skizze → Plansatz (PDF) + IFC
@@ -10,7 +10,9 @@ macht das Skript**, du zeichnest nie selbst (kein matplotlib, kein SVG von Hand)
 Darum sieht jeder Plan gleich aus, und die Masse sind exakt. Das Datenmodell steht in
 `datenmodell.md` (zuerst lesen), ein vollständiges Beispiel in `beispiele/wohnung.json`.
 
-`<skill>` ist unten der Ordner, in dem diese SKILL.md liegt.
+`<skill>` ist unten der Ordner, in dem diese SKILL.md liegt. Der Skill läuft im
+**Claude-Chat** und im **ChatGPT-Chat**; was dabei verschieden ist, steht unter
+«Wo der Skill läuft». Lies das, bevor du das Skript startest.
 
 ## Worum es bei den Zeichnungen geht
 
@@ -71,11 +73,10 @@ diesem Sinn:
    210 ein; das ist dann ein Standardwert und gehört in `angenommen`.
 3. **plan.json schreiben** im Arbeitsordner der Person (nicht im Skill-Ordner). Nullpunkt
    in eine Aussenecke, Achsen in cm.
-4. **Prüfen und erzeugen:**
+4. **Prüfen und erzeugen** (mit deinem Python-Werkzeug, siehe «Wo der Skill läuft»):
 
    ```
-   uv run --python 3.12 --with ifcopenshell --with shapely --with matplotlib \
-       python <skill>/scripts/umbauplan.py plan.json ausgabe/ --vorschau
+   python <skill>/scripts/umbauplan.py plan.json ausgabe/ --vorschau
    ```
 
    Bei `MÄNGEL` nennt das Skript jedes Feld. Behebe sie und lass es erneut laufen.
@@ -113,10 +114,10 @@ bevor du es in den Plan setzt, und frage, wenn darauf Personen oder Privates zu 
 
 Hängt die Person ein Foto an und will sehen, wie der Raum nach dem Umbau aussieht
 («mach das modern», «wie sieht die neue Küche aus», «Fronten in Salbeigrün»), erzeugst du
-mit dem Bildwerkzeug von ChatGPT/Codex ein neues Bild aus **derselben Perspektive**: das
+mit der Bildgenerierung von ChatGPT ein neues Bild aus **derselben Perspektive**: das
 Foto als Eingabebild, neue Einrichtung nach Plan, Farben und Materialien nach den Wünschen
 der Person. **Lies vorher `visualisierung.md`**: Prompt-Vorlage, Ablage der Bilder und was
-zu tun ist, wenn es kein Bildwerkzeug gibt. Foto und Bild trägst du unter
+im Claude-Chat zu tun ist (dort gibt es keine Bildgenerierung). Foto und Bild trägst du unter
 `visualisierungen` in `plan.json` ein; sie kommen als Blatt «Visualisierung vorher/nachher»
 in den Plansatz.
 
@@ -152,26 +153,41 @@ in den Plansatz.
   (EXISTING/DEMOLISH/NEW). Öffnen mit Archicad, Revit, Vectorworks oder einem
   IFC-Viewer (z. B. BIMvision, Bonsai für Blender).
 
-## Voraussetzungen
+## Wo der Skill läuft
 
-Du musst das Skript **selbst ausführen**, nicht nur die Anleitung lesen. Versuche es in
-dieser Reihenfolge und nimm das erste, das geht:
+Du musst das Skript **selbst ausführen**, mit deinem Python-Werkzeug (Codeausführung,
+«Python», «Code Interpreter»). Die Anleitung nur zu lesen genügt nicht, und den Plan zeichnest
+du nie selbst nach. Das Skript braucht shapely, matplotlib, numpy und Pillow; für das IFC
+zusätzlich ifcopenshell. Fehlt nur ifcopenshell, entsteht die PDF trotzdem, ohne IFC.
 
-1. `uv` (Befehl unter Ablauf, Schritt 4): lädt Python 3.12 und die Bibliotheken beim ersten
-   Lauf selbst (ca. 1 Minute).
-2. Vorhandenes Python (auch die Python-Umgebung von ChatGPT): `python <skill>/scripts/umbauplan.py …`.
-   Es braucht shapely, matplotlib und Pillow; fehlt etwas, `pip install shapely matplotlib pillow`.
-   Fehlt nur `ifcopenshell` und lässt es sich nicht installieren, entsteht die PDF trotzdem,
-   nur ohne IFC. Sag das der Person.
-3. Kannst du in dieser Umgebung gar keinen Code ausführen: schreibe `plan.json`, gib es der
-   Person und sag ihr, dass der Plansatz in **Codex** (Codex-App oder `codex` im Terminal)
-   entsteht, weil dort ein Terminal zur Verfügung steht. Zeichne den Plan nie selbst nach.
+1. **Bibliotheken prüfen:** `python -c "import shapely, matplotlib, numpy, PIL"`. Fehlt etwas:
+   `pip install shapely matplotlib pillow ifcopenshell`. Hast du kein Internet (ChatGPT),
+   geht das nicht; ifcopenshell fehlt dann, das ist in Ordnung.
+2. **Skill-Ordner finden:** Such die Datei `scripts/umbauplan.py` neben dieser SKILL.md im
+   Dateisystem deiner Python-Umgebung (Claude: meist unter `/mnt/skills/`; ChatGPT: suche mit
+   `find / -name umbauplan.py -path "*scripts*" 2>/dev/null`). Arbeite mit `plan.json` und
+   `ausgabe/` in deinem Arbeitsordner (ChatGPT: `/mnt/data/`, Claude: `/mnt/user-data/outputs/`
+   für Dateien, die die Person herunterladen soll).
+3. **Liegt der Skill-Ordner nicht in deiner Python-Umgebung** (du kannst SKILL.md lesen, aber
+   `find` findet die Skripte nicht): kopiere den ganzen Ordner `<skill>` mit allen Dateien
+   unverändert dorthin, z. B. nach `/mnt/data/umbauplan/` (Textdateien Zeichen für Zeichen,
+   `assets/` mit Logo und Schrift dazu), und starte das Skript von dort. Klappt auch das nicht,
+   sag der Person genau, was fehlt, und gib ihr `plan.json`. Erfinde keinen Plan.
+4. **Ergebnis abgeben:** PDF (und IFC) als Datei zum Herunterladen, Vorschau-PNGs vorher selbst
+   ansehen (Ablauf, Schritt 6).
+
+`uv` ist optional: Gibt es `uv` (eigener Rechner), geht es ohne Installation mit
+`uv run --python 3.12 --with ifcopenshell --with shapely --with matplotlib python <skill>/scripts/umbauplan.py …`.
+
+**Bilder:** Die Visualisierung (Foto → Bild nach dem Umbau) macht die Bildgenerierung von
+ChatGPT. Im Claude-Chat gibt es keine; dort gibst du der Person den fertigen Prompt für ChatGPT
+(siehe `visualisierung.md`).
 
 ## Was dieser Skill (noch) nicht tut
 
 - Kein Dach, kein Terrain, keine Treppen: Ansichten zeigen die Wände bis zur Decke.
   Schnitte sind senkrecht zu x oder y (keine schrägen Schnitte).
-- Fotorealistische Bilder nur über das Bildwerkzeug von ChatGPT/Codex (siehe
+- Fotorealistische Bilder nur über die Bildgenerierung von ChatGPT (siehe
   `visualisierung.md`), nie selbst gezeichnet. Sie sind nicht massstäblich. Die 3D-Ansicht
   ist eine Planskizze für das Gespräch mit der Bauherrschaft, kein Rendering.
 - Keine schrägen Aussenmassketten: Bemasst werden Fassaden, die parallel zu x oder y

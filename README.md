@@ -6,34 +6,30 @@ Skills für Claude, als Plugin-Marketplace. Aufbau wie `concrete-skills`.
 |---|---|
 | `umbauplan` | Handskizze → Umbau-Plansatz (PDF: Grundriss, Schnitte, Ansichten, 3D vorher/nachher, Visualisierung aus Fotos, Fotos; Bestand/Abbruch/Neu) und IFC-Modell |
 
-## Installieren (Claude Code)
+## Installieren
 
-Lokal, direkt aus diesem Ordner:
-
-```
-/plugin marketplace add ~/Documents/3d-renovationstool
-/plugin install umbauplan@umbau-skills
-```
-
-Liegt das Repo später auf GitHub: `/plugin marketplace add <github-nutzer>/umbau-skills`.
-
-## Installieren (Codex / ChatGPT)
-
-Codex liest denselben Marketplace (`.claude-plugin/marketplace.json`) und die
-Codex-Angaben in `plugins/umbauplan/.codex-plugin/plugin.json`:
+Der Skill läuft im **Claude-Chat** (claude.ai, Claude-App) und im **ChatGPT-Chat**. In beiden
+führt der Chat das Skript in seiner eigenen Python-Umgebung aus; ein eigener Rechner mit
+Python ist nicht nötig. Die Pakete baut `pakete.sh`:
 
 ```
-codex plugin marketplace add <github-nutzer>/umbau-skills
+./pakete.sh      # legt in dist/ zwei ZIPs ab
 ```
 
-In der ChatGPT-Desktop-App erscheint der Marketplace danach unter Plugins, dort
-«Umbauplan» installieren.
+- **ChatGPT:** `dist/umbauplan-chatgpt.zip` unter Plugins hochladen. Das Manifest dafür ist
+  `plugins/umbauplan/.codex-plugin/plugin.json` (Format von OpenAI für Plugins).
+- **Claude:** `dist/umbauplan-claude.zip` unter Einstellungen → Fähigkeiten → Skills hochladen.
+  Codeausführung muss eingeschaltet sein.
+- **Claude Code** (lokal, aus diesem Ordner):
+  `/plugin marketplace add ~/Documents/3d-renovationstool`, dann `/plugin install umbauplan@umbau-skills`.
 
-**Visualisierungen** (Foto vom Bestand → Bild nach dem Umbau, gleiche Perspektive) macht
-das Bildwerkzeug von ChatGPT/Codex. Es läuft über das ChatGPT-Abo der Person, die das
-Plugin nutzt; ein API-Schlüssel ist nicht nötig. In Claude Code gibt es dieses Werkzeug
-nicht: Dort geht es nur, wenn die Codex CLI installiert und mit ChatGPT angemeldet ist.
-Ablauf und Prompt-Vorlage: `plugins/umbauplan/skills/umbauplan/visualisierung.md`.
+**Visualisierungen** (Foto vom Bestand → Bild nach dem Umbau, gleiche Perspektive) macht die
+Bildgenerierung von ChatGPT, über das ChatGPT-Abo der Person. Claude kann keine Bilder
+erzeugen; dort gibt der Skill den fertigen Prompt für ChatGPT aus, und das Bild wird danach
+wieder angehängt. Ablauf und Prompt-Vorlage: `plugins/umbauplan/skills/umbauplan/visualisierung.md`.
+
+**Im ChatGPT-Chat** hat die Python-Umgebung kein Internet. matplotlib, shapely, numpy und
+Pillow sind dort normalerweise vorhanden, ifcopenshell nicht: Es entsteht dann die PDF ohne IFC.
 
 ## Aktualisieren
 
@@ -66,7 +62,8 @@ IFC macht das Skript. Darum sind die Pläne gleich aufgebaut, und die Masse sind
 ```
 .claude-plugin/marketplace.json                 listet die Plugins auf
 plugins/umbauplan/.claude-plugin/plugin.json    Name und Version
-plugins/umbauplan/.codex-plugin/plugin.json     dasselbe für Codex / ChatGPT
+plugins/umbauplan/.codex-plugin/plugin.json     Name und Version für ChatGPT
+pakete.sh                                       baut die ZIPs für ChatGPT und Claude
 plugins/umbauplan/skills/umbauplan/
   SKILL.md            Anleitung für Claude (Ablauf, Regeln)
   datenmodell.md      Aufbau von plan.json
