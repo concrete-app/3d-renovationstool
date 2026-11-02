@@ -11,9 +11,7 @@ Darum sieht jeder Plan gleich aus, und die Masse sind exakt. Das Datenmodell ste
 `datenmodell.md` (zuerst lesen), vollständige Beispiele in `beispiele/wohnung.json`
 (Wohnung) und `beispiele/bad.json` (Badumbau).
 
-`<skill>` ist unten der Ordner, in dem diese SKILL.md liegt. Der Skill läuft im
-**Claude-Chat** und im **ChatGPT-Chat**; was dabei verschieden ist, steht unter
-«Wo der Skill läuft». Lies das, bevor du das Skript startest.
+`<skill>` ist unten der Ordner, in dem diese SKILL.md liegt.
 
 ## Worum es bei den Zeichnungen geht
 
@@ -59,25 +57,13 @@ diesem Sinn:
   (`abbruch`) oder kommt dazu (`neu`). Ist es auf der Skizze nicht klar (Farbe,
   Schraffur, Kreuz, Notiz), frage.
 - **Die PDF entsteht nur mit `scripts/umbauplan.py`.** Kein ReportLab, kein eigener
-  matplotlib-Code, keine Ersatz-PDF, auch nicht «vereinfacht» oder «vorläufig». Läuft das
-  Skript nicht, zeig der Person die Fehlermeldung wörtlich und sag, was fehlt.
-- **Nur melden, was es gibt.** Nenne eine Datei erst, wenn du sie mit `ls` gesehen hast.
+  matplotlib-Code, keine Ersatz-PDF, auch nicht «vereinfacht». Läuft das Skript nicht,
+  zeig der Person die Fehlermeldung wörtlich. Nenne eine Datei erst, wenn du sie mit `ls`
+  gesehen hast.
 - **Platzhalter sind ein Mangel.** Ohne `--entwurf` lehnt das Skript `<…>` in Projekt
   oder `firma.json` ab. Eine Plannummer denkst du dir nicht aus.
 
 ## Ablauf
-
-**Zuerst, einmal pro Unterhaltung: Selbsttest.**
-
-```
-python <skill>/scripts/selbsttest.py
-```
-
-Er prüft Bibliotheken, Skill-Ordner, Firmendaten, Logo und Schrift und erzeugt mit dem
-Originalskript einen Beispiel-Plansatz (Badumbau, 6 Seiten A3) samt Prüfung. Steht am Ende
-`ERGEBNIS: … läuft`, geht es weiter. Steht irgendwo `FEHLT`, melde der Person genau diese
-Zeilen und hör auf; baue keinen Ersatz. `HINWEIS` (z. B. kein IFC ohne ifcopenshell) sagst
-du ihr und machst weiter.
 
 1. **Skizze lesen.** Liste für dich: Aussenwände, Innenwände mit Dicke, Türen und
    Fenster mit Lage und Breite, Raumnamen, Küchen- und Sanitäreinrichtung (alt und neu),
@@ -90,10 +76,11 @@ du ihr und machst weiter.
    210 ein; das ist dann ein Standardwert und gehört in `angenommen`.
 3. **plan.json schreiben** im Arbeitsordner der Person (nicht im Skill-Ordner). Nullpunkt
    in eine Aussenecke, Achsen in cm.
-4. **Prüfen und erzeugen** (mit deinem Python-Werkzeug, siehe «Wo der Skill läuft»):
+4. **Prüfen und erzeugen:**
 
    ```
-   python <skill>/scripts/umbauplan.py plan.json ausgabe/ --vorschau
+   uv run --python 3.12 --with ifcopenshell --with shapely --with matplotlib \
+       python <skill>/scripts/umbauplan.py plan.json ausgabe/ --vorschau
    ```
 
    Bei `MÄNGEL` nennt das Skript jedes Feld. Behebe sie und lass es erneut laufen.
@@ -130,13 +117,12 @@ bevor du es in den Plan setzt, und frage, wenn darauf Personen oder Privates zu 
 ## Visualisierung aus Fotos
 
 Hängt die Person ein Foto an und will sehen, wie der Raum nach dem Umbau aussieht
-(«mach das modern», «wie sieht die neue Küche aus», «Fronten in Salbeigrün»), erzeugst du
-mit der Bildgenerierung von ChatGPT ein neues Bild aus **derselben Perspektive**: das
-Foto als Eingabebild, neue Einrichtung nach Plan, Farben und Materialien nach den Wünschen
-der Person. **Lies vorher `visualisierung.md`**: Prompt-Vorlage, Ablage der Bilder und was
-im Claude-Chat zu tun ist (dort gibt es keine Bildgenerierung). Foto und Bild trägst du unter
-`visualisierungen` in `plan.json` ein; sie kommen als Blatt «Visualisierung vorher/nachher»
-in den Plansatz.
+(«mach das modern», «Fronten in Salbeigrün»), erzeugst du mit der Bildgenerierung von
+ChatGPT ein neues Bild aus **derselben Perspektive**: das Foto als Eingabebild, neue
+Einrichtung nach Plan, Farben und Materialien nach den Wünschen der Person. **Lies vorher
+`visualisierung.md`** (Prompt-Vorlage, Ablage, was im Claude-Chat zu tun ist). Foto und Bild
+trägst du unter `visualisierungen` in `plan.json` ein; sie kommen als Blatt
+«Visualisierung vorher/nachher» in den Plansatz.
 
 ## Was das Skript erzeugt
 
@@ -159,8 +145,7 @@ in den Plansatz.
   4. **3D vorher/nachher** je Geschoss, aus zwei Blickwinkeln: Puppenhaus ohne Decke, vorher
      gelb was wegkommt, nachher rot was neu ist.
   5. **Visualisierung** vorher/nachher, ein Blatt pro Eintrag in `visualisierungen`: Foto
-     links, Bild nach dem Umbau rechts, darunter die Wünsche der Person und der Hinweis
-     «nicht massstäblich».
+     links, Bild nach dem Umbau rechts, darunter die Wünsche und «nicht massstäblich».
   6. **Fotodokumentation**, wenn `fotos` angegeben sind.
 
   Plankopf mit Logo und Firmendaten aus `firma.json` (das-umbau-team.ch) auf jedem Blatt.
@@ -170,46 +155,22 @@ in den Plansatz.
   (EXISTING/DEMOLISH/NEW). Öffnen mit Archicad, Revit, Vectorworks oder einem
   IFC-Viewer (z. B. BIMvision, Bonsai für Blender).
 
-## Wo der Skill läuft
+## Voraussetzungen
 
-Du musst das Skript **selbst ausführen**, mit deinem Python-Werkzeug (Codeausführung,
-«Python», «Code Interpreter»). Die Anleitung nur zu lesen genügt nicht, und den Plan zeichnest
-du nie selbst nach. Das Skript braucht shapely, matplotlib, numpy und Pillow; für das IFC
-zusätzlich ifcopenshell. Fehlt nur ifcopenshell, entsteht die PDF trotzdem, ohne IFC.
-
-1. **Bibliotheken prüfen:** macht der Selbsttest (siehe Ablauf). Fehlt etwas:
-   `pip install shapely matplotlib pillow ifcopenshell`. Hast du kein Internet (ChatGPT),
-   geht das nicht; ifcopenshell fehlt dann, das ist in Ordnung.
-2. **Skill-Ordner finden:** Such die Datei `scripts/umbauplan.py` neben dieser SKILL.md im
-   Dateisystem deiner Python-Umgebung (Claude: meist unter `/mnt/skills/`; ChatGPT: suche mit
-   `find / -name umbauplan.py -path "*scripts*" 2>/dev/null`). Arbeite mit `plan.json` und
-   `ausgabe/` in deinem Arbeitsordner (ChatGPT: `/mnt/data/`, Claude: `/mnt/user-data/outputs/`
-   für Dateien, die die Person herunterladen soll).
-3. **Liegt der Skill-Ordner nicht in deiner Python-Umgebung** (du kannst SKILL.md lesen, aber
-   `find` findet die Skripte nicht): kopiere den ganzen Ordner `<skill>` mit allen Dateien
-   unverändert dorthin, z. B. nach `/mnt/data/umbauplan/` (Textdateien Zeichen für Zeichen,
-   `assets/` mit Logo und Schrift dazu), und starte das Skript von dort. Klappt auch das nicht,
-   sag der Person genau, was fehlt, und gib ihr `plan.json`. Erfinde keinen Plan.
-   Ob ChatGPT die Plugin-Dateien in die Python-Umgebung legt, entscheidet ChatGPT; der
-   Selbsttest zeigt es.
-4. **Ergebnis abgeben:** PDF (und IFC) als Datei zum Herunterladen (ChatGPT: Link auf
-   `/mnt/data/...`; Claude: Datei in `/mnt/user-data/outputs/`). Vorschau-PNGs vorher selbst
-   ansehen (Ablauf, Schritt 6).
-
-`uv` ist optional: Gibt es `uv` (eigener Rechner), geht es ohne Installation mit
-`uv run --python 3.12 --with ifcopenshell --with shapely --with matplotlib python <skill>/scripts/umbauplan.py …`.
-
-**Bilder:** Die Visualisierung (Foto → Bild nach dem Umbau) macht die Bildgenerierung von
-ChatGPT. Im Claude-Chat gibt es keine; dort gibst du der Person den fertigen Prompt für ChatGPT
-(siehe `visualisierung.md`).
+`uv` lädt Python 3.12 und die Bibliotheken beim ersten Lauf selbst (ca. 1 Minute).
+Ohne uv: `pip install ifcopenshell shapely matplotlib` (Python 3.10–3.13), dann
+`python <skill>/scripts/umbauplan.py …`. Gibt es gar kein Python: schreibe `plan.json`
+und sage der Person, dass sie das Skript auf einem Rechner mit Python ausführen muss.
+Läuft etwas nicht, zeigt `selbsttest.py` (gleicher Aufruf mit `uv run`, statt
+`umbauplan.py plan.json …` einfach `<skill>/scripts/selbsttest.py`), was fehlt.
 
 ## Was dieser Skill (noch) nicht tut
 
 - Kein Dach, kein Terrain, keine Treppen: Ansichten zeigen die Wände bis zur Decke.
   Schnitte sind senkrecht zu x oder y (keine schrägen Schnitte).
 - Fotorealistische Bilder nur über die Bildgenerierung von ChatGPT (siehe
-  `visualisierung.md`), nie selbst gezeichnet. Sie sind nicht massstäblich. Die 3D-Ansicht
-  ist eine Planskizze für das Gespräch mit der Bauherrschaft, kein Rendering.
+  `visualisierung.md`), nicht massstäblich. Die 3D-Ansicht ist eine Planskizze für das Gespräch
+  mit der Bauherrschaft, kein Rendering.
 - Keine schrägen Aussenmassketten: Bemasst werden Fassaden, die parallel zu x oder y
   liegen. Schräge Wände werden gezeichnet, aber nicht aussen bemasst.
 - Keine Statik, keine Baubewilligungs-Pläne. Ob eine Wand tragend ist, entscheidet eine

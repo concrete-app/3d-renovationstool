@@ -6,45 +6,25 @@ Skills für Claude, als Plugin-Marketplace. Aufbau wie `concrete-skills`.
 |---|---|
 | `umbauplan` | Handskizze → Umbau-Plansatz (PDF: Grundriss, Schnitte, Ansichten, 3D vorher/nachher, Visualisierung aus Fotos, Fotos; Bestand/Abbruch/Neu) und IFC-Modell |
 
-## Installieren
+## Installieren (Claude Code)
 
-Der Skill läuft im **Claude-Chat** (claude.ai, Claude-App) und im **ChatGPT-Chat**. In beiden
-führt der Chat das Skript in seiner eigenen Python-Umgebung aus; ein eigener Rechner mit
-Python ist nicht nötig. Die Pakete baut `pakete.sh`:
+Lokal, direkt aus diesem Ordner:
 
 ```
-./pakete.sh      # legt in dist/ zwei ZIPs ab
+/plugin marketplace add ~/Documents/3d-renovationstool
+/plugin install umbauplan@umbau-skills
 ```
 
-- **ChatGPT:** `dist/umbauplan-chatgpt.zip` unter Plugins hochladen. Das Manifest dafür ist
-  `plugins/umbauplan/.codex-plugin/plugin.json` (Format von OpenAI für Plugins).
-- **Claude:** `dist/umbauplan-claude.zip` unter Einstellungen → Fähigkeiten → Skills hochladen.
-  Codeausführung muss eingeschaltet sein.
-- **Claude Code** (lokal, aus diesem Ordner):
-  `/plugin marketplace add ~/Documents/3d-renovationstool`, dann `/plugin install umbauplan@umbau-skills`.
+Liegt das Repo später auf GitHub: `/plugin marketplace add <github-nutzer>/umbau-skills`.
+Nur den Skill (z. B. für claude.ai): `./pakete.sh` legt `dist/umbauplan-claude.zip` ab.
 
 **Visualisierungen** (Foto vom Bestand → Bild nach dem Umbau, gleiche Perspektive) macht die
-Bildgenerierung von ChatGPT, über das ChatGPT-Abo der Person. Claude kann keine Bilder
-erzeugen; dort gibt der Skill den fertigen Prompt für ChatGPT aus, und das Bild wird danach
-wieder angehängt. Ablauf und Prompt-Vorlage: `plugins/umbauplan/skills/umbauplan/visualisierung.md`.
+Bildgenerierung von ChatGPT. Claude kann keine Bilder erzeugen; dort gibt der Skill den
+fertigen Prompt für ChatGPT aus. Ablauf: `plugins/umbauplan/skills/umbauplan/visualisierung.md`.
 
-**Im ChatGPT-Chat** hat die Python-Umgebung kein Internet. matplotlib, shapely, numpy und
-Pillow sind dort normalerweise vorhanden, ifcopenshell nicht: Es entsteht dann die PDF ohne IFC.
-
-## So rufen ChatGPT und Claude das Plugin auf
-
-1. **Selbsttest**, einmal pro Unterhaltung, mit dem Python-Werkzeug des Chats:
-   `python <skill>/scripts/selbsttest.py`. Er erzeugt mit dem Originalskript den Plansatz für
-   `beispiele/bad.json` (6 Seiten A3 + IFC) und prüft ihn. `FEHLT` nennt die Ursache
-   (Bibliothek, Skill-Ordner, Firmendaten, Logo, Schrift, Schreibrechte); dann bricht der
-   Chat ab, statt eine Ersatz-PDF zu bauen.
-2. **plan.json schreiben** aus Skizze, Fotos, Massen (Datenmodell: `datenmodell.md`).
-3. **Erzeugen:** `python <skill>/scripts/umbauplan.py plan.json <ausgabe> --vorschau`
-   (ChatGPT: Ausgabe unter `/mnt/data/`, Claude: `/mnt/user-data/outputs/`).
-4. **Vorschau-PNGs ansehen**, dann PDF und IFC zum Herunterladen abgeben.
-
-`<skill>` ist der Ordner mit `SKILL.md`. Findet der Chat die Skripte nicht in seiner
-Python-Umgebung, sagt der Selbsttest das; der Ordner muss dann vollständig dorthin kopiert werden.
+Läuft etwas nicht: `uv run --python 3.12 --with ifcopenshell --with shapely --with matplotlib
+--with pypdf python plugins/umbauplan/skills/umbauplan/scripts/selbsttest.py` erzeugt den
+Plansatz für `beispiele/bad.json` und sagt, was fehlt.
 
 ## Abhängigkeiten
 
@@ -58,8 +38,6 @@ Python-Umgebung, sagt der Selbsttest das; der Ordner muss dann vollständig dort
 | ifcopenshell | 0.9.0 | IFC (optional: fehlt es, entsteht nur die PDF) |
 | pypdf | 6.20.1 | nur Selbsttest und Tests (Textprüfung der PDF) |
 
-Im ChatGPT-Chat gibt es kein Internet: ifcopenshell lässt sich dort nicht nachladen.
-
 ## Aktualisieren
 
 ```
@@ -68,8 +46,7 @@ Im ChatGPT-Chat gibt es kein Internet: ifcopenshell lässt sich dort nicht nachl
 
 Ein Update kommt nur an, wenn sich `version` in
 `plugins/umbauplan/.claude-plugin/plugin.json` geändert hat. **Bei jeder Änderung die
-Version erhöhen**, in beiden Dateien: `.claude-plugin/plugin.json` und
-`.codex-plugin/plugin.json`.
+Version erhöhen.**
 
 ## Firmenauftritt
 
@@ -91,8 +68,7 @@ IFC macht das Skript. Darum sind die Pläne gleich aufgebaut, und die Masse sind
 ```
 .claude-plugin/marketplace.json                 listet die Plugins auf
 plugins/umbauplan/.claude-plugin/plugin.json    Name und Version
-plugins/umbauplan/.codex-plugin/plugin.json     Name und Version für ChatGPT
-pakete.sh                                       baut die ZIPs für ChatGPT und Claude
+pakete.sh                                       baut die Skill-ZIP für claude.ai
 plugins/umbauplan/skills/umbauplan/
   SKILL.md            Anleitung für Claude (Ablauf, Regeln)
   datenmodell.md      Aufbau von plan.json

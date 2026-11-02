@@ -1,6 +1,6 @@
 {
   "name": "umbauplan",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Macht aus Handskizzen einen Umbau-Plansatz (PDF: Grundriss, Schnitte, Ansichten, 3D vorher/nachher, Visualisierung aus Fotos, Fotos; Bestand/Abbruch/Neu) und ein IFC-Modell.",
   "author": { "name": "AKUBA GmbH | das-umbau-team.ch" }
 }
