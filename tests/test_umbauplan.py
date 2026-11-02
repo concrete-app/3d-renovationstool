@@ -437,8 +437,8 @@ def test_visualisierung_vorher_nachher(tmp_path):
     d["blaetter"] = ["fotos", "visualisierung"]
     plan = modell.pruefen(d, FIRMA, basis=tmp_path)
     erzeugt = pdf.pdf_erzeugen(plan, tmp_path / "plan.pdf")
-    assert [e.kurz for e in erzeugt] == ["visualisierung1", "fotos1"]
-    text = PdfReader(tmp_path / "plan.pdf").pages[0].extract_text()
+    assert [e.kurz for e in erzeugt] == ["fotos1", "visualisierung1"]
+    text = PdfReader(tmp_path / "plan.pdf").pages[-1].extract_text()
     assert "Visualisierung Küche" in text and "salbeigrün" in text and "nicht massstäblich" in text
 
 

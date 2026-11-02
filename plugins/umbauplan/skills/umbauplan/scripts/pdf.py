@@ -53,13 +53,13 @@ def pdf_erzeugen(plan: Plan, ziel: Path, entwurf: bool = False,
                     blatt = axonometrie.blatt_3d(plan, g, az, entwurf)
                     yield blatt, Erzeugt(f"3d_{g.id}_{int(az)}", f"3D {g.name} vorher/nachher ({int(az)}°)",
                                          "ohne")
+        if "fotos" in plan.blaetter and plan.fotos:
+            for i, blatt in enumerate(fotos.foto_blaetter(plan, entwurf)):
+                yield blatt, Erzeugt(f"fotos{i + 1}", "Fotodokumentation", "–")
         if "visualisierung" in plan.blaetter:
             for i, blatt in enumerate(visualisierung.visualisierung_blaetter(plan, entwurf)):
                 titel = plan.visualisierungen[i].titel
                 yield blatt, Erzeugt(f"visualisierung{i + 1}", f"Visualisierung {titel}".strip(), "–")
-        if "fotos" in plan.blaetter and plan.fotos:
-            for i, blatt in enumerate(fotos.foto_blaetter(plan, entwurf)):
-                yield blatt, Erzeugt(f"fotos{i + 1}", "Fotodokumentation", "–")
 
     erzeugt = []
     with PdfPages(ziel, metadata={"Title": f"{plan.projekt.name} – Umbau",

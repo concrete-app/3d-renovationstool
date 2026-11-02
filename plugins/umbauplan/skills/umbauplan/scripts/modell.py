@@ -22,7 +22,7 @@ OBJEKTTYPEN = ("kueche", "wc", "lavabo", "dusche", "badewanne", "schrank",
                "waschturm", "bett", "tisch", "sofa", "andere")
 ZUSTAENDE = ("beide", "bestand", "neu")
 MASSSTAEBE = (20, 50, 100, 200)
-BLAETTER = ("grundriss", "schnitte", "ansichten", "3d", "visualisierung", "fotos")
+BLAETTER = ("grundriss", "schnitte", "ansichten", "3d", "fotos", "visualisierung")
 FOTOFORMATE = (".jpg", ".jpeg", ".png")
 
 PLATZHALTER = re.compile(r"<[^<>]*>|\[[^\[\]]*…[^\[\]]*\]")

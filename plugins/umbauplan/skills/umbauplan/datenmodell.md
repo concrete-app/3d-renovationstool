@@ -148,7 +148,7 @@ Pfad relativ zum Ordner von `plan.json`. Nur JPG und PNG.
 ## blaetter (oben, optional)
 
 Welche Blätter in die PDF kommen, Standard alle:
-`["grundriss", "schnitte", "ansichten", "3d", "visualisierung", "fotos"]`.
+`["grundriss", "schnitte", "ansichten", "3d", "fotos", "visualisierung"]`.
 
 ## angenommen[] (oben, neben projekt)
 

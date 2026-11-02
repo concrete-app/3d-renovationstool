@@ -76,7 +76,16 @@ diesem Sinn:
    210 ein; das ist dann ein Standardwert und gehört in `angenommen`.
 3. **plan.json schreiben** im Arbeitsordner der Person (nicht im Skill-Ordner). Nullpunkt
    in eine Aussenecke, Achsen in cm.
-4. **Prüfen und erzeugen:**
+4. **Hat die Person Fotos angehängt, zuerst die Bilder nach dem Umbau erzeugen**, bevor du
+   das Skript startest (nach `visualisierung.md`): pro Foto ein Bild in derselben
+   Perspektive, mit der neuen Einrichtung aus `plan.json` und ihren Farb- und
+   Materialwünschen. Leg jedes Bild als Datei neben `plan.json` ab (z. B.
+   `visualisierungen/bad_neu.png`, mit `ls` prüfen) und trag Foto und Bild unter
+   `visualisierungen` in `plan.json` ein. Sie kommen ans Ende der PDF. Liegt ein Bild nicht
+   als Datei in deiner Python-Umgebung, bitte die Person, es herunterzuladen und wieder
+   anzuhängen, und erzeuge die PDF danach neu. Gib nie eine PDF ohne diese Blätter ab, ohne
+   zu sagen, dass sie fehlen.
+5. **Prüfen und erzeugen:**
 
    ```
    uv run --python 3.12 --with ifcopenshell --with shapely --with matplotlib \
@@ -86,16 +95,16 @@ diesem Sinn:
    Bei `MÄNGEL` nennt das Skript jedes Feld. Behebe sie und lass es erneut laufen.
    `--nur-pruefen` prüft, ohne zu zeichnen. Fehlen nur Firmendaten oder Plannummer,
    kannst du mit `--entwurf` eine Vorschau zeigen.
-5. **Warnungen ernst nehmen.** «endet frei» heisst meist, dass eine Achse ein paar cm
+6. **Warnungen ernst nehmen.** «endet frei» heisst meist, dass eine Achse ein paar cm
    neben der anderen endet und darum ein Raum nicht geschlossen ist. «liegt in keiner
    geschlossenen Fläche» und «hat keinen Raumnamen» haben dieselbe Ursache. Korrigiere
    die Koordinaten, statt die Warnung stehen zu lassen.
-6. **Ansehen.** Öffne die Vorschau-PNGs (die Pfade stehen am Ende der Skriptausgabe)
+7. **Ansehen.** Öffne die Vorschau-PNGs (die Pfade stehen am Ende der Skriptausgabe)
    mit Read und vergleiche es Wand für Wand mit der Skizze: Lage der Türen, Aufschlag,
    Fenster, Farben, Masse der Öffnungen (F1 70 × 90, BRH 1.10). Vergleiche die lichten Masse aus der Skriptausgabe mit den Massen
    auf der Skizze. Schau auch Schnitt- und 3D-Blatt an: Stehen Abbruch (gelb) und Neu
    (rot) dort, wo die Person sie haben will? Erst dann meldest du das Ergebnis.
-7. **Melden:** Pfade zu PDF und IFC, die Liste der Blätter, Räume mit Fläche (aus der Skriptausgabe, nicht
+8. **Melden:** Pfade zu PDF und IFC, die Liste der Blätter (mit den Visualisierungen), Räume mit Fläche (aus der Skriptausgabe, nicht
    selbst gerechnet), die Liste `angenommen` und offene Warnungen. Schreibe dazu, dass
    eine Fachperson die Masse vor der Ausführung prüfen muss.
 
@@ -144,9 +153,9 @@ trägst du unter `visualisierungen` in `plan.json` ein; sie kommen als Blatt
   3. **Ansichten** der vier Fassaden, mit Himmelsrichtung, wenn `nordwinkel` angegeben ist.
   4. **3D vorher/nachher** je Geschoss, aus zwei Blickwinkeln: Puppenhaus ohne Decke, vorher
      gelb was wegkommt, nachher rot was neu ist.
-  5. **Visualisierung** vorher/nachher, ein Blatt pro Eintrag in `visualisierungen`: Foto
-     links, Bild nach dem Umbau rechts, darunter die Wünsche und «nicht massstäblich».
-  6. **Fotodokumentation**, wenn `fotos` angegeben sind.
+  5. **Fotodokumentation**, wenn `fotos` angegeben sind.
+  6. **Visualisierung** vorher/nachher, am Ende, ein Blatt pro Eintrag in `visualisierungen`:
+     Foto links, Bild nach dem Umbau rechts, darunter die Wünsche und «nicht massstäblich».
 
   Plankopf mit Logo und Firmendaten aus `firma.json` (das-umbau-team.ch) auf jedem Blatt.
   Nur einzelne Blätter: `--blaetter grundriss,3d` oder `"blaetter"` in `plan.json`.
