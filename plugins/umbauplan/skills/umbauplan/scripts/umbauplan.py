@@ -7,7 +7,8 @@
 Die PDF enthält Grundrisse, Schnitte, Ansichten, 3D vorher/nachher, Visualisierungen und Fotos
 (was davon, steht in plan.json unter "blaetter" oder in --blaetter).
 
-Braucht ifcopenshell, shapely und matplotlib. Ohne Installation:
+Braucht shapely, matplotlib und Pillow, für das IFC zusätzlich ifcopenshell
+(fehlt es, entsteht nur die PDF). Ohne Installation:
 
     uv run --python 3.12 --with ifcopenshell --with shapely --with matplotlib \\
         python umbauplan.py plan.json ausgabe/
@@ -84,7 +85,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     from pdf import pdf_erzeugen                   # erst hier: matplotlib ist langsam zu laden
-    from ifc_export import ifc_erzeugen
+    try:
+        from ifc_export import ifc_erzeugen
+    except ImportError:                            # z. B. ChatGPT-Sandbox ohne ifcopenshell
+        ifc_erzeugen = None
 
     try:
         args.ausgabe.mkdir(parents=True, exist_ok=True)
@@ -93,7 +97,8 @@ def main(argv: list[str] | None = None) -> int:
         ifc = args.ausgabe / f"{stamm}.ifc"
         vorschau = args.ausgabe / f"{stamm}_vorschau.png" if args.vorschau else None
         blaetter = pdf_erzeugen(plan, pdf, entwurf=args.entwurf, vorschau=vorschau)
-        ifc_erzeugen(plan, ifc)
+        if ifc_erzeugen:
+            ifc_erzeugen(plan, ifc)
     except Fehlerhaft as e:
         print("\nMÄNGEL beim Zeichnen:")
         for mangel in e.maengel:
@@ -105,7 +110,10 @@ def main(argv: list[str] | None = None) -> int:
     for i, b in enumerate(blaetter, 1):
         hinweis = f" ({wunsch} passte nicht auf A3)" if b.massstab.startswith("1:") and b.massstab != wunsch else ""
         print(f"  {i:2}. {b.inhalt}, {b.massstab}{hinweis}")
-    print(f"  {ifc}")
+    if ifc_erzeugen:
+        print(f"  {ifc}")
+    else:
+        print("  KEIN IFC: ifcopenshell fehlt (pip install ifcopenshell). Die PDF ist vollständig.")
     if vorschau:
         print("Vorschau:")
         for b in blaetter:

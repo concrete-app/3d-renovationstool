@@ -154,10 +154,18 @@ in den Plansatz.
 
 ## Voraussetzungen
 
-`uv` lädt Python 3.12 und die Bibliotheken beim ersten Lauf selbst (ca. 1 Minute).
-Ohne uv: `pip install ifcopenshell shapely matplotlib` (Python 3.10–3.13), dann
-`python <skill>/scripts/umbauplan.py …`. Gibt es gar kein Python: schreibe `plan.json`
-und sage der Person, dass sie das Skript auf einem Rechner mit Python ausführen muss.
+Du musst das Skript **selbst ausführen**, nicht nur die Anleitung lesen. Versuche es in
+dieser Reihenfolge und nimm das erste, das geht:
+
+1. `uv` (Befehl unter Ablauf, Schritt 4): lädt Python 3.12 und die Bibliotheken beim ersten
+   Lauf selbst (ca. 1 Minute).
+2. Vorhandenes Python (auch die Python-Umgebung von ChatGPT): `python <skill>/scripts/umbauplan.py …`.
+   Es braucht shapely, matplotlib und Pillow; fehlt etwas, `pip install shapely matplotlib pillow`.
+   Fehlt nur `ifcopenshell` und lässt es sich nicht installieren, entsteht die PDF trotzdem,
+   nur ohne IFC. Sag das der Person.
+3. Kannst du in dieser Umgebung gar keinen Code ausführen: schreibe `plan.json`, gib es der
+   Person und sag ihr, dass der Plansatz in **Codex** (Codex-App oder `codex` im Terminal)
+   entsteht, weil dort ein Terminal zur Verfügung steht. Zeichne den Plan nie selbst nach.
 
 ## Was dieser Skill (noch) nicht tut
 

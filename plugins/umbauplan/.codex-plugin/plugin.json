@@ -1,15 +1,20 @@
 {
   "name": "umbauplan",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Macht aus Handskizzen einen Umbau-Plansatz (PDF: Grundriss, Schnitte, Ansichten, 3D vorher/nachher, Visualisierung aus Fotos, Fotos; Bestand/Abbruch/Neu) und ein IFC-Modell.",
   "author": { "name": "AKUBA GmbH | das-umbau-team.ch" },
   "skills": "./skills/",
   "interface": {
     "displayName": "Umbauplan",
     "shortDescription": "Skizze und Fotos → Umbau-Plansatz, IFC und Visualisierung",
+    "longDescription": "Für Küchen-, Bad- und Gesamtrenovationen: Aus Handskizzen, Masstexten, Fotos oder einem alten Plan entsteht ein massstäblicher Umbau-Plansatz als PDF (Grundriss, Schnitte, Ansichten, 3D vorher/nachher; Bestand schwarz, Abbruch gelb, Neu rot, mit Plankopf) und ein IFC-Modell. Angehängte Fotos vom Bestand werden mit der Bildgenerierung von ChatGPT in derselben Perspektive neu erzeugt, mit neuer Einrichtung und den gewünschten Farben und Materialien, und kommen als Blatt «Visualisierung vorher/nachher» in den Plansatz.",
     "developerName": "AKUBA GmbH | das-umbau-team.ch",
     "category": "Productivity",
+    "capabilities": ["Read", "Write"],
     "websiteURL": "https://das-umbau-team.ch",
+    "brandColor": "#D71920",
+    "composerIcon": "./assets/logo.png",
+    "logo": "./assets/logo.png",
     "defaultPrompt": [
       "Mach aus dieser Skizze einen Umbauplan.",
       "Zeig mir diese Küche nach dem Umbau, gleiche Perspektive, Fronten salbeigrün."
