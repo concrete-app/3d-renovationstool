@@ -1,6 +1,6 @@
 """Setzt alle Blätter zu einer PDF zusammen.
 
-Reihenfolge: Grundrisse (je Geschoss), Schnitte, Ansichten, 3D (je Geschoss,
+Reihenfolge: Grundrisse (je Geschoss), Schnitte, Ansichten, Raumblätter (Wandansichten), 3D (je Geschoss,
 zwei Blickwinkel), Visualisierungen, Fotos. Welche Blätter es gibt, steht in plan.blaetter.
 """
 
@@ -16,6 +16,7 @@ import ansichten
 import axonometrie
 import fotos
 import grundriss
+import raumansichten
 import visualisierung
 from blatt import schrift_setzen
 from modell import Plan
@@ -47,6 +48,9 @@ def pdf_erzeugen(plan: Plan, ziel: Path, entwurf: bool = False,
         if "ansichten" in plan.blaetter:
             blatt, m = ansichten.ansichten_blatt(plan, entwurf)
             yield blatt, Erzeugt("ansichten", "Ansichten (4 Seiten)", f"1:{m}")
+        if "raumansichten" in plan.blaetter:
+            for n, (blatt, name, m) in enumerate(raumansichten.raumansichten_blaetter(plan, entwurf), 1):
+                yield blatt, Erzeugt(f"raum{n}", f"Wandansichten A–D {name}", f"1:{m}")
         if "3d" in plan.blaetter:
             for g in plan.geschosse:
                 for az in BLICKWINKEL_3D:

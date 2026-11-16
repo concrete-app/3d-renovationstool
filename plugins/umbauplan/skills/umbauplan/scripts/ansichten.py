@@ -234,7 +234,9 @@ def zeichnen(fenster: Fenster, plan: Plan, e: Ebene, ansicht: bool) -> None:
     for i, t in enumerate(sichtflaechen(plan, e, ansicht)):
         z = 2 + i * 0.001
         kontur = SYMBOL[t.status] if t.status != "bestand" else TEXT
-        flaeche(ax, t.flaeche, facecolor="white", edgecolor=kontur, linewidth=PT_FEIN,
+        # Was wegkommt, verdeckt nichts: nur gestrichelt umrissen, dahinter bleibt sichtbar
+        fuellung = "none" if t.status == "abbruch" else "white"
+        flaeche(ax, t.flaeche, facecolor=fuellung, edgecolor=kontur, linewidth=PT_FEIN,
                 linestyle=STRICH[t.status], zorder=z)
         for art, r, status in t.details:
             _rahmen(ax, art, r, status, z + 0.0005)
@@ -265,10 +267,11 @@ def ausdehnung(plan: Plan, e: Ebene) -> tuple[float, float, float, float]:
     return min(us), z0, max(us), z1
 
 
-def hoehen(fenster: Fenster, plan: Plan, u0: float, u1: float, schnitt: bool) -> None:
-    """Koten links, Höhenkette rechts: Boden, Decke je Geschoss."""
+def hoehen(fenster: Fenster, plan: Plan, u0: float, u1: float, schnitt: bool,
+           geschosse: list[Geschoss] | None = None) -> None:
+    """Koten links, Höhenkette rechts: Boden, Decke je Geschoss (alle oder nur `geschosse`)."""
     punkte = []
-    for g in plan.geschosse:
+    for g in geschosse or plan.geschosse:
         kote(fenster, u0 - fenster.mm(9), g.kote)
         kote(fenster, u0 - fenster.mm(9), g.kote + g.raumhoehe)
         punkte += [g.kote - g.deckenstaerke, g.kote, g.kote + g.raumhoehe]

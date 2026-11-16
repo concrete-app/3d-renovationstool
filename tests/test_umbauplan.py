@@ -224,9 +224,10 @@ def test_pdf_hat_alle_blaetter(tmp_path):
     plan = pruefen(beispiel())
     ziel = tmp_path / "plan.pdf"
     erzeugt = pdf.pdf_erzeugen(plan, ziel)
-    assert [e.kurz for e in erzeugt] == ["EG", "schnitte", "ansichten", "3d_EG_225", "3d_EG_45"]
+    assert [e.kurz for e in erzeugt] == ["EG", "schnitte", "ansichten", "raum1", "raum2", "raum3",
+                                         "3d_EG_225", "3d_EG_45"]
     seiten = PdfReader(ziel).pages
-    assert len(seiten) == 5
+    assert len(seiten) == 8
     for seite in seiten:
         breite_mm = float(seite.mediabox.width) / 72 * 25.4
         hoehe_mm = float(seite.mediabox.height) / 72 * 25.4
@@ -462,13 +463,60 @@ def test_bad_beispiel_gueltig_ohne_warnungen():
     assert bad.m2 > {r.name: r for r in geometrie.raeume(plan.geschosse[0], "bestand")}["Bad"].m2
 
 
+# --- Raumblätter (Wandansichten A–D) --------------------------------------
+
+def test_raumansichten_nur_umbauraeume(tmp_path):
+    import pdf
+    import raumansichten
+    from pypdf import PdfReader
+    d = json.loads((SKILL / "beispiele" / "bad.json").read_text(encoding="utf-8"))
+    plan = pruefen(d)
+    assert [r.name for _, r in raumansichten.umbauraeume(plan)] == ["Bad"]  # Zimmer, Korridor: nur Wände
+    d["blaetter"] = ["raumansichten"]
+    erzeugt = pdf.pdf_erzeugen(pruefen(d), tmp_path / "plan.pdf")
+    assert [e.kurz for e in erzeugt] == ["raum1"]
+    text = PdfReader(tmp_path / "plan.pdf").pages[0].extract_text()
+    for erwartet in ("Grundriss Bad", "Ansicht A", "Ansicht B", "Ansicht C", "Ansicht D",
+                     "Bad – Wandansichten A–D", "B-002-R1"):
+        assert erwartet in text, erwartet
+
+
+def test_raumansichten_blickrichtung_und_umfassung():
+    import raumansichten
+    plan = pruefen(json.loads((SKILL / "beispiele" / "bad.json").read_text(encoding="utf-8")))
+    g, bad = raumansichten.umbauraeume(plan)[0]
+    # Aussenwände 30 (links, unten), Innenwand 12 oben, neue Wand 10 rechts
+    x0, y0, x1, y1 = bad.flaeche.bounds
+    assert raumansichten._umfassung(g, bad) == pytest.approx((x0 - 30, y0 - 30, x1 + 10, y1 + 12))
+    richtung = {b: (e.achse, e.blick) for b, e in raumansichten.ebenen(bad)}
+    # A schaut nach oben (+y), B nach rechts (+x), C nach unten, D nach links
+    for b, (x, y) in {"A": (0, 1), "B": (1, 0), "C": (0, -1), "D": (-1, 0)}.items():
+        e = dict(raumansichten.ebenen(bad))[b]
+        cx, cy = bad.beschriftungspunkt
+        assert e.tiefe(cx + 50 * x, cy + 50 * y) > e.tiefe(cx, cy), (b, richtung[b])
+
+
+def test_raumansichten_uebersteuern():
+    import raumansichten
+    d = json.loads((SKILL / "beispiele" / "bad.json").read_text(encoding="utf-8"))
+    d["raumansichten"] = ["Zimmer", "Bad"]
+    assert [r.name for _, r in raumansichten.umbauraeume(pruefen(d))] == ["Zimmer", "Bad"]
+    d["raumansichten"] = []
+    assert raumansichten.umbauraeume(pruefen(d)) == []
+    d["raumansichten"] = ["Gibtsnicht"]
+    with pytest.raises(modell.Fehlerhaft, match="Raum 'Gibtsnicht' gibt es nach dem Umbau nicht"):
+        raumansichten.umbauraeume(pruefen(d))
+    d["raumansichten"] = "Bad"
+    assert "raumansichten muss eine Liste" in maengel(d)
+
+
 def test_selbsttest_gesamtlauf(tmp_path, capsys):
     pytest.importorskip("ifcopenshell")
     pytest.importorskip("pypdf")
     import selbsttest
     assert selbsttest.main([str(tmp_path)]) == 0
     ausgabe = capsys.readouterr().out
-    assert "FEHLT" not in ausgabe and "PDF hat 6 Seiten" in ausgabe
+    assert "FEHLT" not in ausgabe and "PDF hat 7 Seiten" in ausgabe
     assert (tmp_path / "B-002_umbau.pdf").is_file() and (tmp_path / "B-002.ifc").is_file()
 
 # --- IFC ------------------------------------------------------------------

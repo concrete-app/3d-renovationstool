@@ -4,7 +4,7 @@ Skills für Claude, als Plugin-Marketplace. Aufbau wie `concrete-skills`.
 
 | Plugin | Was es tut |
 |---|---|
-| `umbauplan` | Handskizze → Umbau-Plansatz (PDF: Grundriss, Schnitte, Ansichten, 3D vorher/nachher, Visualisierung aus Fotos, Fotos; Bestand/Abbruch/Neu) und IFC-Modell |
+| `umbauplan` | Handskizze → Umbau-Plansatz (PDF: Grundriss, Schnitte, Ansichten, Wandansichten A–D, 3D vorher/nachher, Visualisierung aus Fotos, Fotos; Bestand/Abbruch/Neu) und IFC-Modell |
 
 ## Installieren (Claude Code)
 
@@ -81,6 +81,7 @@ plugins/umbauplan/skills/umbauplan/
     blatt.py          A3-Blatt, massstäbliche Fenster, Plankopf, Massketten
     grundriss.py      Grundriss mit Massketten und Schnittlinien
     ansichten.py      Schnitte und Fassadenansichten
+    raumansichten.py  Raumblatt: Grundriss und Wandansichten A–D je Umbauraum
     axonometrie.py    3D vorher/nachher
     visualisierung.py Blatt Visualisierung vorher/nachher
     fotos.py          Fotodokumentation

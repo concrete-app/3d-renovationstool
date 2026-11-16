@@ -6,7 +6,7 @@
 Prüft Python, Bibliotheken, Skill-Ordner, Firmendaten, Logo und Schrift und erzeugt
 dann mit den Originalfunktionen (modell.pruefen, umbauplan.erzeugen) den Plansatz
 für beispiele/bad.json, mit zwei Testbildern als Fotodokumentation. Danach prüft
-er das Ergebnis: 6 Seiten A3, Plankopf mit Firmendaten und Logo auf jeder Seite,
+er das Ergebnis: 7 Seiten A3, Plankopf mit Firmendaten und Logo auf jeder Seite,
 Massstab 1:50, keine Geometrie-Warnungen, IFC lesbar.
 
 Jede Zeile ist OK, HINWEIS (geht, aber eingeschränkt) oder FEHLT (mit Ursache und
@@ -33,7 +33,7 @@ from modell import SKILL, _platzhalter, firma_laden  # noqa: E402  (nur Standard
 
 PFLICHT = ("shapely", "matplotlib", "numpy", "PIL")
 A3_PT = (1190.55, 841.89)
-ERWARTET = ["OG", "schnitte", "ansichten", "3d_OG_225", "3d_OG_45", "fotos1"]
+ERWARTET = ["OG", "schnitte", "ansichten", "raum1", "3d_OG_225", "3d_OG_45", "fotos1"]
 
 
 class Bericht:
@@ -168,7 +168,7 @@ def main(argv: list[str] | None = None) -> int:
 
     # --- Ergebnis prüfen ----------------------------------------------------------
     kurz = [e.kurz for e in erg.blaetter]
-    b.pruefe(kurz == ERWARTET, "Blätter: Grundriss, Schnitte, Ansichten, 3D ×2, Fotodokumentation",
+    b.pruefe(kurz == ERWARTET, "Blätter: Grundriss, Schnitte, Ansichten, Wandansichten Bad, 3D ×2, Fotodokumentation",
              f"erzeugt wurden {kurz}")
     for e in erg.blaetter[:3]:
         b.pruefe(e.massstab == "1:50", f"{e.inhalt}: Massstab {e.massstab}", "erwartet 1:50")
@@ -178,7 +178,7 @@ def main(argv: list[str] | None = None) -> int:
     b.pruefe(erg.pdf.is_file() and erg.pdf.stat().st_size > 10_000, f"PDF gespeichert: {erg.pdf}")
     roh = erg.pdf.read_bytes()
     seiten = len(re.findall(rb"/Type\s*/Page\b", roh))
-    b.pruefe(seiten == 6, f"PDF hat {seiten} Seiten", "erwartet 6")
+    b.pruefe(seiten == len(ERWARTET), f"PDF hat {seiten} Seiten", f"erwartet {len(ERWARTET)}")
     formate = re.findall(rb"/MediaBox\s*\[\s*0\s+0\s+([\d.]+)\s+([\d.]+)\s*\]", roh)
     b.pruefe(len(formate) == seiten and all(abs(float(w) - A3_PT[0]) < 1 and abs(float(h) - A3_PT[1]) < 1
                                             for w, h in formate), "Alle Seiten A3 quer", f"gefunden: {formate}")
@@ -198,7 +198,7 @@ def main(argv: list[str] | None = None) -> int:
         except Exception as e:  # noqa: BLE001
             b.fehlt_(f"PDF lässt sich nicht öffnen: {e}")
     fehlende = [v.name for v in erg.vorschauen if not v.is_file()]
-    b.pruefe(not fehlende and len(erg.vorschauen) == 6, f"{len(erg.vorschauen)} Vorschau-PNGs",
+    b.pruefe(not fehlende and len(erg.vorschauen) == len(ERWARTET), f"{len(erg.vorschauen)} Vorschau-PNGs",
              f"fehlen: {fehlende}")
 
     if hat_ifc:

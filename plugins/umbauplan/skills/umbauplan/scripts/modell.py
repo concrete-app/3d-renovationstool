@@ -22,7 +22,7 @@ OBJEKTTYPEN = ("kueche", "wc", "lavabo", "dusche", "badewanne", "schrank",
                "waschturm", "bett", "tisch", "sofa", "andere")
 ZUSTAENDE = ("beide", "bestand", "neu")
 MASSSTAEBE = (20, 50, 100, 200)
-BLAETTER = ("grundriss", "schnitte", "ansichten", "3d", "fotos", "visualisierung")
+BLAETTER = ("grundriss", "schnitte", "ansichten", "raumansichten", "3d", "fotos", "visualisierung")
 FOTOFORMATE = (".jpg", ".jpeg", ".png")
 
 PLATZHALTER = re.compile(r"<[^<>]*>|\[[^\[\]]*…[^\[\]]*\]")
@@ -176,6 +176,7 @@ class Plan:
     schnitte: list[Schnitt] = field(default_factory=list)  # leer: das Skript legt A–A und B–B selbst
     fotos: list[Foto] = field(default_factory=list)
     visualisierungen: list[Visualisierung] = field(default_factory=list)
+    raumansichten: list[str] | None = None  # None: das Skript wählt die Umbauräume selbst
     blaetter: tuple[str, ...] = BLAETTER
 
 
@@ -497,6 +498,13 @@ def pruefen(daten: dict, firma: dict | None = None, entwurf: bool = False,
             titel=pr.text(vo, "titel", vp, pflicht=False),
             wuensche=pr.text(vo, "wuensche", vp, pflicht=False)))
 
+    raumansichten = None
+    if "raumansichten" in daten:
+        raumansichten = pr.liste(daten, "raumansichten", "")
+        if not all(isinstance(r, str) and r.strip() for r in raumansichten):
+            pr.maengel.append(f"raumansichten muss eine Liste von Raumnamen sein, ist {raumansichten!r}")
+            raumansichten = None
+
     blaetter = daten.get("blaetter", list(BLAETTER))
     if not isinstance(blaetter, list) or not blaetter or any(b not in BLAETTER for b in blaetter):
         pr.maengel.append(f"blaetter muss eine Liste aus {', '.join(BLAETTER)} sein, ist {blaetter!r}")
@@ -510,4 +518,4 @@ def pruefen(daten: dict, firma: dict | None = None, entwurf: bool = False,
         raise Fehlerhaft(pr.maengel)
     return Plan(projekt=projekt, geschosse=geschosse, firma=firma, angenommen=angenommen,
                 schnitte=schnitte, fotos=fotos,
-                visualisierungen=visualisierungen, blaetter=tuple(b for b in BLAETTER if b in blaetter))
+                visualisierungen=visualisierungen, raumansichten=raumansichten, blaetter=tuple(b for b in BLAETTER if b in blaetter))

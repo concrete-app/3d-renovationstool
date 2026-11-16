@@ -145,10 +145,20 @@ Pfad relativ zum Ordner von `plan.json`. Nur JPG und PNG.
 `visualisierung.md`). Pfade relativ zum Ordner von `plan.json`, nur JPG und PNG.
 `titel` und `wuensche` sind optional und stehen auf dem Blatt.
 
+## raumansichten (oben, optional)
+
+```json
+"raumansichten": ["Bad", "Küche"]
+```
+Räume (Name wie unter `raeume`), die ein Blatt mit Raumgrundriss und den vier Wandansichten
+A–D bekommen. Weglassen: jeder Raum mit Küche oder Sanitär (`kueche`, `wc`, `lavabo`,
+`dusche`, `badewanne`, `waschturm`) oder mit Einrichtung `abbruch`/`neu`. `[]`: keine.
+A schaut zur Planseite oben, B nach rechts, C nach unten, D nach links.
+
 ## blaetter (oben, optional)
 
 Welche Blätter in die PDF kommen, Standard alle:
-`["grundriss", "schnitte", "ansichten", "3d", "fotos", "visualisierung"]`.
+`["grundriss", "schnitte", "ansichten", "raumansichten", "3d", "fotos", "visualisierung"]`.
 
 ## angenommen[] (oben, neben projekt)
 

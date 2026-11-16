@@ -1,6 +1,6 @@
 ---
 name: umbauplan
-description: Macht bei Küchen-, Bad- und Gesamtrenovationen aus Handskizzen, Masstexten, Fotos oder einem alten Plan einen massstäblichen Umbau-Plansatz als PDF (Grundriss, Schnitte, Ansichten, 3D vorher/nachher, Fotodokumentation; Bestand schwarz, Abbruch gelb, Neu rot, mit Plankopf) und ein IFC-Modell. Macht aus Fotos vom Bestand Visualisierungen nach dem Umbau in derselben Perspektive (Bildgenerierung von ChatGPT). Verwenden, wenn jemand einen Grundriss, Umbauplan, Schnitt, eine Ansicht, 3D-Ansicht, Visualisierung oder ein IFC/BIM-Modell aus einer Skizze will, oder ein Foto anhängt und sehen will, wie der Raum modern oder nach dem Umbau aussieht.
+description: Macht bei Küchen-, Bad- und Gesamtrenovationen aus Handskizzen, Masstexten, Fotos oder einem alten Plan einen massstäblichen Umbau-Plansatz als PDF (Grundriss, Schnitte, Ansichten, Wandansichten A–D je Bad/Küche, 3D vorher/nachher, Fotodokumentation; Bestand schwarz, Abbruch gelb, Neu rot, mit Plankopf) und ein IFC-Modell. Macht aus Fotos vom Bestand Visualisierungen nach dem Umbau in derselben Perspektive (Bildgenerierung von ChatGPT). Verwenden, wenn jemand einen Grundriss, Umbauplan, Schnitt, eine Ansicht, 3D-Ansicht, Visualisierung oder ein IFC/BIM-Modell aus einer Skizze will, oder ein Foto anhängt und sehen will, wie der Raum modern oder nach dem Umbau aussieht.
 ---
 
 # Umbauplan: Skizze → Plansatz (PDF) + IFC
@@ -151,10 +151,14 @@ trägst du unter `visualisierungen` in `plan.json` ein; sie kommen als Blatt
      wo sie möglichst viele Öffnungen und Umbauteile treffen. Bestimmte Schnitte: `schnitte`
      in `plan.json` (siehe `datenmodell.md`).
   3. **Ansichten** der vier Fassaden, mit Himmelsrichtung, wenn `nordwinkel` angegeben ist.
-  4. **3D vorher/nachher** je Geschoss, aus zwei Blickwinkeln: Puppenhaus ohne Decke, vorher
+  4. **Wandansichten A–D** je Umbauraum (wie ein Nasszellen- oder Küchenplan): Raumgrundriss
+     mit Blickpfeilen und alle vier Wände von innen, mit Apparaten, Türen, Fenstern, Koten und
+     Höhenmassen. Umbauraum ist jeder Raum mit Küche oder Sanitär oder mit Einrichtung, die
+     wegfällt oder neu kommt. Andere Räume: `"raumansichten": ["Bad", "Küche"]` in `plan.json`.
+  5. **3D vorher/nachher** je Geschoss, aus zwei Blickwinkeln: Puppenhaus ohne Decke, vorher
      gelb was wegkommt, nachher rot was neu ist.
-  5. **Fotodokumentation**, wenn `fotos` angegeben sind.
-  6. **Visualisierung** vorher/nachher, am Ende, ein Blatt pro Eintrag in `visualisierungen`:
+  6. **Fotodokumentation**, wenn `fotos` angegeben sind.
+  7. **Visualisierung** vorher/nachher, am Ende, ein Blatt pro Eintrag in `visualisierungen`:
      Foto links, Bild nach dem Umbau rechts, darunter die Wünsche und «nicht massstäblich».
 
   Plankopf mit Logo und Firmendaten aus `firma.json` (das-umbau-team.ch) auf jedem Blatt.
