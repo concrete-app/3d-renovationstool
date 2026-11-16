@@ -510,6 +510,21 @@ def test_raumansichten_uebersteuern():
     assert "raumansichten muss eine Liste" in maengel(d)
 
 
+def test_ausgabe_endet_mit_noch_zu_tun(tmp_path, capsys):
+    import umbauplan
+    from PIL import Image
+    Image.new("RGB", (40, 30), "white").save(tmp_path / "bad.jpg")
+    d = json.loads((SKILL / "beispiele" / "bad.json").read_text(encoding="utf-8"))
+    d["fotos"] = [{"datei": "bad.jpg"}]
+    d["blaetter"] = ["grundriss", "fotos"]
+    (tmp_path / "plan.json").write_text(json.dumps(d), encoding="utf-8")
+    assert umbauplan.main([str(tmp_path / "plan.json"), str(tmp_path / "aus"), "--vorschau"]) == 0
+    rest = capsys.readouterr().out.split("NOCH ZU TUN")[1]
+    assert "B-002_vorschau_OG.png" in rest and "keine Visualisierung" in rest
+    assert "3 Annahmen" in rest and "Fachperson" in rest
+    assert rest.strip().splitlines()[-1].lstrip().startswith("4. Der Person melden")
+
+
 def test_selbsttest_gesamtlauf(tmp_path, capsys):
     pytest.importorskip("ifcopenshell")
     pytest.importorskip("pypdf")

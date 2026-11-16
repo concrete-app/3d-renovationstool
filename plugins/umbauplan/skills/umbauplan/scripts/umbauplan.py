@@ -137,7 +137,40 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  {v}")
     if args.entwurf:
         print("\nENTWURF: nicht als fertig weitergeben.")
+    noch_zu_tun(plan, erg, warnungen)
     return 0
+
+
+def noch_zu_tun(plan, erg: Ergebnis, warnungen: list[str]) -> None:
+    """Was nach dem Lauf noch zu tun ist, bevor der Person geantwortet wird. Steht am Ende der
+    Ausgabe, damit es nicht überlesen wird."""
+    punkte = []
+    if warnungen:
+        punkte.append(f"{len(warnungen)} Warnung(en) oben beheben (Koordinaten in plan.json) und neu erzeugen.")
+    if erg.vorschauen:
+        punkte.append("Jedes Vorschaubild ansehen und mit der Skizze vergleichen (Türen, Aufschlag, "
+                      "Fenster, Masse, Abbruch gelb / Neu rot):")
+        punkte += [f"    {v}" for v in erg.vorschauen]
+    else:
+        punkte.append("Mit --vorschau neu erzeugen und die Vorschaubilder ansehen.")
+    fotos = {f.datei.name for f in plan.fotos}
+    if fotos and not plan.visualisierungen:
+        punkte.append(f"Es gibt {len(fotos)} Foto(s), aber keine Visualisierung: pro Foto ein Bild nach dem "
+                      "Umbau erzeugen, unter visualisierungen eintragen, neu erzeugen (visualisierung.md). "
+                      "Geht das nicht, der Person sagen, dass die Visualisierung fehlt.")
+    if plan.angenommen:
+        punkte.append(f"Der Person alle {len(plan.angenommen)} Annahmen nennen (Liste «Angenommen» oben).")
+    punkte.append("Der Person melden: PDF" + (" und IFC" if erg.ifc else "") + " als Datei, Liste der "
+                  f"{len(erg.blaetter)} Blätter, Räume mit Fläche (aus dieser Ausgabe), und dass eine "
+                  "Fachperson die Masse vor der Ausführung prüfen muss.")
+    print("\nNOCH ZU TUN, bevor du antwortest (Pflicht, nichts auslassen):")
+    nr = 0
+    for p in punkte:
+        if p.startswith("    "):  # Bildpfad zum vorigen Punkt
+            print(p)
+        else:
+            nr += 1
+            print(f"  {nr}. {p}")
 
 
 if __name__ == "__main__":

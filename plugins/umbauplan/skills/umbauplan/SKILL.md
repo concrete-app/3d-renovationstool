@@ -13,6 +13,25 @@ Darum sieht jeder Plan gleich aus, und die Masse sind exakt. Das Datenmodell ste
 
 `<skill>` ist unten der Ordner, in dem diese SKILL.md liegt.
 
+## Pflicht, jedes Mal – nichts davon weglassen
+
+Arbeite diese Liste der Reihe nach ab. Lass keinen Punkt aus, auch wenn die Person es eilig
+hat oder der Plan einfach aussieht. Die Einzelheiten stehen unter «Ablauf».
+
+1. Fehlende Masse und unklaren Status (bestand/abbruch/neu) **erfragen**, nicht schätzen.
+2. `plan.json` schreiben, mit **allen** Apparaten und Möbeln alt und neu unter `objekte`.
+3. **Fotos angehängt?** Dann zuerst pro Foto ein Bild nach dem Umbau erzeugen und unter
+   `visualisierungen` eintragen (`visualisierung.md`).
+4. **Skript ausführen** (`scripts/umbauplan.py … --vorschau`), bis keine `MÄNGEL` und keine
+   `WARNUNGEN` mehr kommen.
+5. Den Block **«NOCH ZU TUN»** am Ende der Skriptausgabe Punkt für Punkt erledigen. Er sagt,
+   welche Vorschaubilder du ansehen und was du melden musst.
+6. **Erst dann** der Person antworten: PDF und IFC als Datei, Blätter, Räume mit Fläche,
+   Liste `angenommen`, Hinweis «Masse vor Ausführung durch Fachperson prüfen».
+
+Kannst du einen Punkt nicht erfüllen (kein Python, Bild nicht als Datei, Mass fehlt), sag das
+der Person ausdrücklich, statt ihn still zu überspringen.
+
 ## Worum es bei den Zeichnungen geht
 
 Die Skizzen und Pläne kommen aus **Küchenumbauten, Badumbauten und
