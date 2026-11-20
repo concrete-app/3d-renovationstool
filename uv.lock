@@ -1,5 +1,5 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = ">=3.12, <3.14"
 
 [[package]]
@@ -416,6 +416,7 @@ source = { virtual = "." }
 dev = [
     { name = "ifcopenshell" },
     { name = "matplotlib" },
+    { name = "pillow" },
     { name = "pypdf" },
     { name = "pytest" },
     { name = "shapely" },
@@ -427,7 +428,8 @@ dev = [
 dev = [
     { name = "ifcopenshell", specifier = ">=0.8" },
     { name = "matplotlib", specifier = ">=3.8" },
-    { name = "pypdf" },
+    { name = "pillow", specifier = ">=13.0.0" },
+    { name = "pypdf", specifier = ">=6.21.4" },
     { name = "pytest" },
     { name = "shapely", specifier = ">=2" },
 ]

@@ -34,9 +34,9 @@ Plansatz für `beispiele/bad.json` und sagt, was fehlt.
 | shapely | 2.2.0 | Geometrie, Räume, Flächen |
 | matplotlib | 3.11.2 | alle Blätter, PDF |
 | numpy | 2.5.4 | 3D, Bilder |
-| pillow | 12.3.0 | Fotos, Logo |
+| pillow | 13.0.0 | Fotos, Logo |
 | ifcopenshell | 0.9.0 | IFC (optional: fehlt es, entsteht nur die PDF) |
-| pypdf | 6.20.1 | nur Selbsttest und Tests (Textprüfung der PDF) |
+| pypdf | 6.21.4 | nur Selbsttest und Tests (Textprüfung der PDF) |
 
 ## Aktualisieren
 

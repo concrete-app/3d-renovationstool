@@ -6,7 +6,8 @@ requires-python = ">=3.12,<3.14"
 dependencies = []
 
 [dependency-groups]
-dev = ["pytest", "ifcopenshell>=0.8", "shapely>=2", "matplotlib>=3.8", "pypdf"]
+dev = ["pytest", "ifcopenshell>=0.8", "shapely>=2", "matplotlib>=3.8", "pypdf>=6.21.4",
+       "pillow>=13.0.0"]  # Untergrenzen: Sicherheitsfixes (Dependabot)
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
