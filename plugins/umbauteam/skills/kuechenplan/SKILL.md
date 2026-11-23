@@ -14,6 +14,8 @@ Offerte gehen kann.
 `<kern>` ist der gemeinsame Ordner **plankern**: `<skill>/plankern`, wenn es ihn gibt
 (claude.ai), sonst `<skill>/../../plankern` (Plugin). `<skill>` ist der Ordner dieser SKILL.md.
 
+0. **Situationsaufnahme** (Formular das-umbau-team.ch) vorhanden? Sie ist die Hauptquelle:
+   `<kern>/situationsaufnahme.md` lesen und das Formular vollständig einlesen.
 1. `<kern>/regeln.md`: Pflichtliste, Grundregeln, Ablauf, Skriptaufruf. Gilt vollständig.
 2. `<kern>/kueche.md`: Küche lesen, Elemente aus `<kern>/bauteile-kueche.json`, Geräte als `einbau`.
 3. `<kern>/datenmodell.md`: Aufbau von `plan.json`. Beispiel: `<kern>/beispiele/kueche.json`.
@@ -26,10 +28,12 @@ Offerte gehen kann.
   «Wenn etwas nicht klappt» in `<kern>/regeln.md` befolgen.
 - **Beispiele (`<kern>/beispiele/`) nie als Projekt zeichnen.** Skizze als PDF/Scan:
   `python <kern>/scripts/seiten.py datei.pdf`, dann jede Seite ansehen.
-- Masse und Status (bleibt / weg / neu) von der Skizze oder erfragen, nie schätzen.
+- **Erst zeichnen, dann fragen:** fehlende Masse als Annahme setzen (`<kern>/situationsaufnahme.md`),
+  jede in `angenommen`; Rückfragen (höchstens 5) erst mit dem fertigen Plan.
 - Neue Küche: jedes Element mit `artikel` aus `bauteile-kueche.json`; alte Küche als Block `kueche`.
 - Erzeugen mit
-  `uv run --python 3.12 --with ifcopenshell --with shapely --with matplotlib python <kern>/scripts/umbauplan.py plan.json ausgabe/ --vorschau`,
+  `uv run --python 3.12 --with ifcopenshell --with shapely --with matplotlib python <kern>/scripts/umbauplan.py plan.json ausgabe/ --entwurf --vorschau`
+  (ohne `--entwurf` nur ohne Annahmen),
   bis keine MÄNGEL und WARNUNGEN mehr kommen; dann «NOCH ZU TUN» abarbeiten.
 - Melden: PDF, IFC und `<plannummer>_stueckliste.json` als Datei, Blätter, Räume mit Fläche,
   Annahmen, Elemente `ohne_artikel`, «Masse vor Ausführung durch Fachperson prüfen».

@@ -521,7 +521,8 @@ def test_ausgabe_endet_mit_noch_zu_tun(tmp_path, capsys):
     rest = capsys.readouterr().out.split("NOCH ZU TUN")[1]
     assert "B-002_vorschau_OG.png" in rest and "keine Visualisierung" in rest
     assert "3 Annahmen" in rest and "Fachperson" in rest
-    assert rest.strip().splitlines()[-1].lstrip().startswith("4. Der Person melden")
+    assert "mit --entwurf neu erzeugen" in rest  # bad.json hat Annahmen
+    assert rest.strip().splitlines()[-1].lstrip().startswith("5. Der Person melden"), rest
 
 
 def test_selbsttest_gesamtlauf(tmp_path, capsys):
@@ -717,3 +718,17 @@ def test_seiten_macht_png_pro_seite(tmp_path):
     except RuntimeError:
         pytest.skip("kein PDF-Renderer installiert")
     assert len(pfade) == 3 and all(p.suffix == ".png" and p.stat().st_size > 0 for p in pfade)
+
+
+def test_beschriftung_zu_breit_oder_ueberlappend():
+    d = json.loads((SKILL / "beispiele" / "bad.json").read_text(encoding="utf-8"))
+    g = pruefen(d).geschosse[0]
+    assert geometrie.beschriftung_warnungen(g, 50) == []  # Beispiel ist sauber
+    objekte = d["geschosse"][0]["objekte"]
+    objekte.append({"typ": "lavabo", "position": [222.5, 150], "breite": 60, "tiefe": 45, "rotation": 90,
+                    "status": "neu", "bezeichnung": "Waschtisch mit Spiegel"})
+    objekte.append({"typ": "andere", "position": [100, 200], "breite": 25, "tiefe": 20, "rotation": 90,
+                    "status": "neu", "bezeichnung": "Vorwand"})
+    text = " ".join(geometrie.beschriftung_warnungen(pruefen(d).geschosse[0], 50))
+    assert "«Waschtisch mit Spiegel» (lavabo) ist im Grundriss breiter als das Objekt" in text
+    assert "«Vorwand» (andere)" in text and "als Wand mit Status neu" in text

@@ -13,7 +13,7 @@ ein eigenes schreibst.
   - **Aussenmass** (Gebäude aussen): Achsmass = Aussenmass − halbe Dicke je Seite.
     Aussen 10.80 m mit 30-cm-Wänden → Achsen 10.50 m auseinander.
   - **Lichtes Mass** (Raum innen): Achsmass = lichtes Mass + halbe Dicke je Seite.
-  - Unklar: nachfragen. Das Skript gibt die lichten Masse jedes Raums aus. Vergleiche
+  - Unklar: lichte Masse annehmen und in `angenommen` eintragen. Das Skript gibt die lichten Masse jedes Raums aus. Vergleiche
     sie mit der Skizze.
 - **Wände treffen sich auf der Achse.** Bei einer Ecke enden beide Achsen im selben
   Punkt. Eine Innenwand, die auf eine Aussenwand trifft, endet auf deren Achse. Das
@@ -26,7 +26,7 @@ ein eigenes schreibst.
 |---|---|---|
 | `name` | ja | «Umbau Wohnung Meier, 2. OG» |
 | `adresse` | ja | Adresse des Objekts |
-| `plannummer` | ja | von der Person, nicht erfinden |
+| `plannummer` | ja | aus der Situationsaufnahme (Projekt / Objekt-Nr.) oder von der Person; nie erfinden |
 | `bauherr` | nein | |
 | `datum` | nein | `JJJJ-MM-TT`, sonst heute |
 | `gezeichnet` | nein | Kürzel |
@@ -180,7 +180,7 @@ auf dem Plan unter der Legende. Beispiel: `"Raumhöhe 2.50 (Standardwert)"`.
 
 ## Standardwerte
 
-Nur verwenden, wenn die Person ausdrücklich zustimmt, und dann in `angenommen` eintragen.
+Für alles, was fehlt (siehe `situationsaufnahme.md`). Jeder verwendete Wert gehört in `angenommen`.
 
 | Bauteil | Wert |
 |---|---|

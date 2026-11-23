@@ -107,6 +107,8 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     warnungen = [h for g in plan.geschosse for h in geometrie.warnungen(g)]
+    warnungen += [h for g in plan.geschosse
+                  for h in geometrie.beschriftung_warnungen(g, plan.projekt.massstab)]
 
     print(f"Projekt: {plan.projekt.name} ({plan.projekt.plannummer})")
     for g in plan.geschosse:
@@ -158,16 +160,19 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  {v}")
     if args.entwurf:
         print("\nENTWURF: nicht als fertig weitergeben.")
-    noch_zu_tun(plan, erg, warnungen)
+    noch_zu_tun(plan, erg, warnungen, args.entwurf)
     return 0
 
 
-def noch_zu_tun(plan, erg: Ergebnis, warnungen: list[str]) -> None:
+def noch_zu_tun(plan, erg: Ergebnis, warnungen: list[str], entwurf: bool = False) -> None:
     """Was nach dem Lauf noch zu tun ist, bevor der Person geantwortet wird. Steht am Ende der
     Ausgabe, damit es nicht überlesen wird."""
     punkte = []
     if warnungen:
-        punkte.append(f"{len(warnungen)} Warnung(en) oben beheben (Koordinaten in plan.json) und neu erzeugen.")
+        punkte.append(f"{len(warnungen)} Warnung(en) oben beheben (Koordinaten oder Bezeichnungen in plan.json) "
+                      "und neu erzeugen.")
+    if plan.angenommen and not entwurf:
+        punkte.append("Der Plan enthält Annahmen: mit --entwurf neu erzeugen, damit «ENTWURF» darauf steht.")
     if erg.vorschauen:
         punkte.append("Jedes Vorschaubild ansehen und mit der Skizze vergleichen (Türen, Aufschlag, "
                       "Fenster, Masse, Abbruch gelb / Neu rot):")

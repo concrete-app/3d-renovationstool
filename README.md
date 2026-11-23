@@ -86,6 +86,7 @@ plugins/umbauteam/plankern/
   kueche.md, bad.md   Küche bzw. Bad lesen und zeichnen
   datenmodell.md      Aufbau von plan.json
   visualisierung.md   Foto → Bild nach dem Umbau (Prompt-Vorlage)
+  situationsaufnahme.md Formular das-umbau-team.ch → plan.json, Annahmen, Rückfragen
   bauteile-kueche.json  Bauteilkatalog Küche OHNE Preise, aus dem Offerten-Tool
                         (dort: pnpm run bauteile-export)
   firma.json          Firmendaten für den Plankopf

@@ -4,14 +4,15 @@ Die Person hängt ein Foto an (z. B. die alte Küche) und will sehen, wie es nac
 Umbau aussieht. Du erzeugst daraus mit der **Bildgenerierung von ChatGPT** ein neues
 Bild aus **genau demselben Blickwinkel**, mit neuer Einrichtung nach Plan und den Farb-
 und Materialwünschen der Person. Das Bild läuft über das ChatGPT-Abo der Person, ein
-API-Schlüssel ist nicht nötig. Im Claude-Chat gibt es keine Bildgenerierung, siehe unten.
+API-Schlüssel ist nicht nötig. Ohne Bildgenerierung (Claude, Codex ohne Bildwerkzeug) siehe unten.
 Das Skript zeichnet nichts davon, es setzt Foto und Bild nur als Blatt «Visualisierung»
 in den Plansatz.
 
 ## Ablauf
 
 1. **Foto ansehen.** Was zeigt es (Raum, Blickrichtung, Fenster, Türen, Einrichtung)?
-   Personen oder Privates darauf: zuerst fragen. HEIC vorher umwandeln:
+   Personen darauf: nicht fragen; das Bild nach dem Umbau zeigt keine Personen (steht im
+   Prompt). HEIC vorher umwandeln:
    `sips -s format jpeg bild.heic --out bild.jpg`. Das Foto gehört in den Arbeitsordner
    neben `plan.json`, z. B. `/mnt/data/fotos/kueche.jpg` (angehängte Dateien liegen in
    ChatGPT schon in `/mnt/data/`).
@@ -21,8 +22,8 @@ in den Plansatz.
    Bei einer Küche mit Elementen (`artikel`) beschreibst du die neue Zeile von links nach
    rechts aus den Elementen, wie sie im Foto stehen: Hochschränke mit Geräten, Unterschränke
    mit Auszügen, Kochfeld, Spüle, Geschirrspüler, Oberschränke und Haube (siehe `kueche.md`).
-   Sonst nimm, was die Person sagt. Fehlt Wichtiges (Wanne raus oder bleibt sie?), frage
-   einmal knapp nach. Farben, Materialien und Stil aus der Nachricht der Person übernimmst
+   Sonst nimm, was die Person sagt oder was die Nachher-Skizze zeigt. Ist etwas offen (Wanne raus
+   oder bleibt sie?), entscheide wie in `plan.json` und nenne es mit dem Ergebnis. Farben, Materialien und Stil aus der Nachricht der Person übernimmst
    du wörtlich in den Prompt.
 3. **Prompt nach der Vorlage unten schreiben** und die Bildgenerierung aufrufen, **mit dem
    angehängten Foto als Vorlage** (das Foto bearbeiten, nicht ein neues Bild ohne Vorlage
@@ -77,9 +78,10 @@ materials and proportions, no people, no text, no logos, no watermark, no extra 
 or doors.
 ```
 
-## Im Claude-Chat
+## Ohne Bildgenerierung (Claude, Codex)
 
-Claude kann keine Bilder erzeugen. Dann:
+Kannst du keine Bilder erzeugen, stellst du **den Plan trotzdem fertig** (mit den Fotos in der
+Fotodokumentation) und sagst in der Antwort, dass die Visualisierung fehlt. Dazu:
 
 1. Schreib den Prompt nach der Vorlage fertig aus (mit Abbruch, Neu und Wünschen).
 2. Gib ihn der Person in einem Codeblock und sag ihr: «In ChatGPT das Foto anhängen, diesen

@@ -12,6 +12,8 @@ Für **Gesamtrenovationen**: alle Räume, auch die, die bleiben.
 `<kern>` ist der gemeinsame Ordner **plankern**: `<skill>/plankern`, wenn es ihn gibt
 (claude.ai), sonst `<skill>/../../plankern` (Plugin). `<skill>` ist der Ordner dieser SKILL.md.
 
+0. **Situationsaufnahme** (Formular das-umbau-team.ch) vorhanden? Sie ist die Hauptquelle:
+   `<kern>/situationsaufnahme.md` lesen und das Formular vollständig einlesen.
 1. `<kern>/regeln.md`: Pflichtliste, Grundregeln, Ablauf, Skriptaufruf. Gilt vollständig.
 2. Für jede Küche `<kern>/kueche.md` (Elemente aus `<kern>/bauteile-kueche.json`), für jedes
    Bad und WC `<kern>/bad.md`.
@@ -26,11 +28,14 @@ Für **Gesamtrenovationen**: alle Räume, auch die, die bleiben.
   «Wenn etwas nicht klappt» in `<kern>/regeln.md` befolgen.
 - **Beispiele (`<kern>/beispiele/`) nie als Projekt zeichnen.** Skizze als PDF/Scan:
   `python <kern>/scripts/seiten.py datei.pdf`, dann jede Seite ansehen.
+- **Erst zeichnen, dann fragen:** fehlende Masse als Annahme setzen (`<kern>/situationsaufnahme.md`),
+  jede in `angenommen`; Rückfragen (höchstens 5) erst mit dem fertigen Plan.
 - Bestand vollständig erfassen: alle Wände, Öffnungen und Räume, nicht nur Küche und Bad.
 - Wände, die wegkommen, `abbruch`; neue Wände `neu`; zusammengelegte Räume mit eigenem
   Raumpunkt `zustand: "neu"`. Ob eine Wand tragend ist, entscheidet eine Fachperson.
 - Erzeugen mit
-  `uv run --python 3.12 --with ifcopenshell --with shapely --with matplotlib python <kern>/scripts/umbauplan.py plan.json ausgabe/ --vorschau`,
+  `uv run --python 3.12 --with ifcopenshell --with shapely --with matplotlib python <kern>/scripts/umbauplan.py plan.json ausgabe/ --entwurf --vorschau`
+  (ohne `--entwurf` nur ohne Annahmen),
   bis keine MÄNGEL und WARNUNGEN mehr kommen; dann «NOCH ZU TUN» abarbeiten.
 - Melden: PDF, IFC (und Stückliste, wenn es eine neue Küche gibt) als Datei, Blätter, Räume
   mit Fläche, Annahmen, «Masse vor Ausführung durch Fachperson prüfen». Keine Preise.

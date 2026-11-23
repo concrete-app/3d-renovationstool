@@ -211,6 +211,53 @@ def warnungen(g: Geschoss) -> list[str]:
     return hinweise
 
 
+OBJEKT_TEXT_PT = 5.5  # Schriftgrösse der Objektbezeichnung im Grundriss
+
+
+def beschriftung_text(b) -> str:
+    """Text, den der Grundriss in ein Objekt schreibt (leer: nur Symbol)."""
+    return b.bezeichnung or (b.typ.capitalize() if b.typ in ("tisch", "sofa", "andere") else "")
+
+
+def beschriftung_senkrecht(b) -> bool:
+    """Bezeichnung senkrecht schreiben: bei Objekten, die im Plan höher als breit sind."""
+    x0, y0, x1, y1 = objekt_polygon(b).bounds
+    return (y1 - y0) > (x1 - x0)
+
+
+def beschriftung_warnungen(g: Geschoss, massstab: int) -> list[str]:
+    """Objektbezeichnungen, die im Grundriss breiter sind als das Objekt oder sich überdecken.
+    Geschätzt mit mittlerer Zeichenbreite; massstab ist der kleinste mögliche (z. B. 50)."""
+    cm_pro_mm = massstab / 10
+    breite_zeichen = OBJEKT_TEXT_PT * 0.3528 * 0.55 * cm_pro_mm   # cm je Zeichen
+    hoehe = OBJEKT_TEXT_PT * 0.3528 * 1.2 * cm_pro_mm
+    texte = []
+    hinweise = []
+    for b in g.objekte:
+        text = beschriftung_text(b)
+        if not text:
+            continue
+        x0, y0, x1, y1 = objekt_polygon(b).bounds
+        cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+        senkrecht = beschriftung_senkrecht(b)
+        laenge = (y1 - y0) if senkrecht else (x1 - x0)   # Platz entlang der Schrift
+        w = len(text) * breite_zeichen
+        if w > laenge + 2:
+            passt = max(1, int(laenge / breite_zeichen))
+            hinweise.append(f"{g.id}: Bezeichnung «{text}» ({b.typ}) ist im Grundriss breiter als das Objekt; "
+                            f"höchstens {passt} Zeichen, kürzer schreiben oder weglassen"
+                            + (" (eine Vorwand als Wand mit Status neu zeichnen, nicht als Objekt)"
+                               if b.typ == "andere" else ""))
+        rahmen = (box(cx - hoehe / 2, cy - w / 2, cx + hoehe / 2, cy + w / 2) if senkrecht
+                  else box(cx - w / 2, cy - hoehe / 2, cx + w / 2, cy + hoehe / 2))
+        for anderer, r in texte:
+            if rahmen.intersects(r):
+                hinweise.append(f"{g.id}: Bezeichnungen «{anderer}» und «{text}» liegen im Grundriss "
+                                f"übereinander; eine weglassen (das Symbol genügt) oder kürzen")
+        texte.append((text, rahmen))
+    return hinweise
+
+
 def aussenumriss(g: Geschoss) -> Polygon:
     """Aussenkontur aller Wände (für Bodenplatte und Bemassung)."""
     alle = vereinigen(wand_polygon(w) for w in g.waende)

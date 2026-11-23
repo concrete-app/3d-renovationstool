@@ -289,9 +289,9 @@ def legende(blatt: Blatt, plan: Plan, notiz: str | None = None) -> None:
     notizen = [notiz or "Masse in m, unter 1 m in cm. Alle Masse vor Ausführung am Bau prüfen."]
     if plan.angenommen:
         notizen.append("Angenommen, nicht gemessen:")
-        notizen += [f"– {a}" for a in plan.angenommen[:6]]
-        if len(plan.angenommen) > 6:
-            notizen.append(f"– und {len(plan.angenommen) - 6} weitere")
+        notizen += [f"– {a}" for a in plan.angenommen[:10]]
+        if len(plan.angenommen) > 10:
+            notizen.append(f"– und {len(plan.angenommen) - 10} weitere (siehe Rückmeldung)")
     ax.text(x, y - 4, "\n".join(notizen), ha="left", va="top", fontsize=5.5, color=GRAU, linespacing=1.4)
 
 

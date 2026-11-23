@@ -13,7 +13,7 @@ Breite, Tiefe, Höhe, Montagehöhe und eingebaute Geräte; du gibst nur Lage, Ro
 ```
 
 - **Nur IDs aus `bauteile-kueche.json`.** Unbekannte IDs lehnt das Skript ab. Gibt es eine Breite
-  nicht (z.B. 70 cm), nimm die nächste passende und nenne die Abweichung, oder frag nach.
+  nicht (z.B. 70 cm), nimm die nächste passende, trag die Abweichung in `angenommen` ein und nenne sie.
 - Typen: `unterschrank` (89 cm inkl. Sockel, Arbeitsplatte 4 cm zeichnet das Skript dazu),
   `hochschrank` (209 cm), `oberschrank` (63 cm hoch, Unterkante 146 cm, Oberkante bündig mit
   dem Hochschrank). Oberschränke liegen im Grundriss über den Unterschränken: gleiche Lage
@@ -25,9 +25,10 @@ Breite, Tiefe, Höhe, Montagehöhe und eingebaute Geräte; du gibst nur Lage, Ro
   `dampfabzug`). Kochfeld über einem normalen Unterschrank: dort `"einbau": ["kochfeld"]`.
 - Reihenfolge und Lage kommen von der Skizze. Die Breiten der Elemente einer Zeile ergeben
   zusammen die Länge der Zeile; ein Rest bis zur Wand ist eine Passleiste (nicht zeichnen,
-  in der Rückmeldung nennen). Ecken: Eck-Unterschrank (`KU-EU-…`) oder offene Ecke, fragen.
+  in der Rückmeldung nennen). Ecken: Eck-Unterschrank (`KU-EU-…`), wenn die Skizze nichts anderes zeigt; in `angenommen` eintragen.
 - Masse aus der Skizze gehen vor: Steht auf der Skizze eine Zeile von 3.20 m, müssen die
-  Elemente 3.20 m ergeben. Stimmt es nicht auf, frag.
+  Elemente 3.20 m ergeben. Stimmt es nicht auf, gleiche mit einer Passleiste aus, trag das in
+  `angenommen` ein und frag mit dem Entwurf nach.
 
 ## Bestehende Küche
 

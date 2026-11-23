@@ -196,9 +196,10 @@ def objekt_zeichnen(ax, b: Objekt) -> None:
     elif b.typ == "bett":
         poly([(-hb + 5, -ht + 5), (hb - 5, -ht + 5), (hb - 5, -ht + 35), (-hb + 5, -ht + 35)])
     # Objekte mit eigenem Symbol brauchen keinen Text, ausser eine Bezeichnung ist angegeben
-    beschriftung = b.bezeichnung or (b.typ.capitalize() if b.typ in ("tisch", "sofa", "andere") else "")
+    beschriftung = geometrie.beschriftung_text(b)
     if beschriftung:
-        ax.text(cx, cy, beschriftung, ha="center", va="center", fontsize=5.5, color=farbe, zorder=7)
+        ax.text(cx, cy, beschriftung, ha="center", va="center", fontsize=geometrie.OBJEKT_TEXT_PT,
+                rotation=90 if geometrie.beschriftung_senkrecht(b) else 0, color=farbe, zorder=7)
 
 
 # --- Räume ----------------------------------------------------------------
