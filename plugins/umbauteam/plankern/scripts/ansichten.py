@@ -24,7 +24,7 @@ import geometrie
 from blatt import (FUELLUNG, KONTUR, PT_DICK, PT_FEIN, PT_MITTEL, STRICH, SYMBOL, TEXT,
                    ZEICHENFLAECHE, Blatt, Fenster, flaeche, kote, legende, linie, masskette, passt,
                    plankopf, titel)
-from modell import Fehlerhaft, Geschoss, Oeffnung, Plan, Schnitt, Wand
+from modell import ARBEITSPLATTE, KUECHENTYPEN, SOCKEL, Fehlerhaft, Geschoss, Objekt, Oeffnung, Plan, Schnitt, Wand
 
 GROSS = 1e5  # cm, «unendlich» für Halbebenen
 
@@ -196,7 +196,8 @@ def sichtflaechen(plan: Plan, e: Ebene, ansicht: bool) -> list[Sichtflaeche]:
             if sicht.is_empty or sicht.area < 1:
                 continue
             ua, ub = e.u_bereich(sicht)
-            teile.append(Sichtflaeche(e.tiefe_min(sicht), box(ua, z0, ub, z0 + b.hoehe), b.status, []))
+            teile.append(Sichtflaeche(e.tiefe_min(sicht), box(ua, z0 + b.z_unten, ub, z0 + b.z_oben), b.status,
+                                      fronten(b, e, ua, ub, z0)))
         if ansicht:
             umriss = geometrie.aussenumriss(g)
             ua, ub = e.u_bereich(umriss)
@@ -209,10 +210,55 @@ def sichtflaechen(plan: Plan, e: Ebene, ansicht: bool) -> list[Sichtflaeche]:
     return sorted(teile, key=lambda t: -t.tiefe)
 
 
+EINBAU_TEXT = {"spuele": "Spüle", "kochfeld": "Kochfeld", "backofen": "BO", "steamer": "ST",
+               "geschirrspueler": "GS", "kuehlschrank": "KS", "dampfabzug": "DA", "muldenlueftung": "Kochfeld/DA"}
+
+
+def fronten(b: Objekt, e: Ebene, ua: float, ub: float, z0: float) -> list[tuple[str, Polygon, str]]:
+    """Fronteinteilung eines Küchenelements, wenn man es von vorne sieht (Wandansicht, Schnitt):
+    Sockel, Türen/Auszüge, Arbeitsplatte, Beschriftung der Einbaugeräte. Von der Seite nur Sockel
+    und Arbeitsplatte."""
+    if b.typ not in KUECHENTYPEN:
+        return []
+    a = math.radians(b.rotation)
+    vorne = (-math.sin(a), math.cos(a))  # Richtung, in die die Front schaut
+    blick = (0.0, 1.0) if e.achse == "x" else (1.0, 0.0)
+    if e.blick == "minus":
+        blick = (-blick[0], -blick[1])
+    von_vorne = vorne[0] * blick[0] + vorne[1] * blick[1] < -0.7
+    unten, oben = z0 + b.montagehoehe, z0 + b.montagehoehe + b.hoehe
+    teile: list[tuple[str, Polygon, str]] = []
+    if b.typ != "oberschrank":
+        teile.append(("front", box(ua, unten, ub, unten + SOCKEL), b.status))
+        unten += SOCKEL
+    if b.typ == "unterschrank":
+        teile.append(("front", box(ua, oben, ub, oben + ARBEITSPLATTE), b.status))
+    if not von_vorne:
+        return teile
+    breite = ub - ua
+    if b.typ == "unterschrank" and not b.einbau:  # Auszüge übereinander
+        teile.append(("front", box(ua, unten, ub, unten + (oben - unten) / 2), b.status))
+    elif b.typ == "hochschrank":  # Klappe oben, darunter Tür(en) bzw. Gerätenischen
+        teile.append(("front", box(ua, oben - 38, ub, oben), b.status))
+    if breite > 65 and "geschirrspueler" not in b.einbau:  # zwei Türen
+        teile.append(("front", box(ua, unten, ua + breite / 2, oben - (38 if b.typ == "hochschrank" else 0)), b.status))
+    if b.einbau:
+        text = " / ".join(EINBAU_TEXT[x] for x in b.einbau)
+        teile.append((f"text:{text}", box(ua, unten, ub, oben), b.status))
+    return teile
+
+
 def _rahmen(ax, art: str, r: Polygon, status: str, z: float) -> None:
     farbe, strich = SYMBOL[status], STRICH[status]
     x0, y0, x1, y1 = r.bounds
     kw = dict(color=farbe, linestyle=strich, zorder=z)
+    if art.startswith("text:"):
+        ax.text((x0 + x1) / 2, (y0 + y1) / 2, art[5:], ha="center", va="center", fontsize=4.5,
+                color=farbe, zorder=z, rotation=90 if x1 - x0 < 35 else 0)
+        return
+    if art == "front":
+        flaeche(ax, r, facecolor="none", edgecolor=farbe, linewidth=PT_FEIN, linestyle=strich, zorder=z)
+        return
     if art == "zumauern":
         flaeche(ax, r, facecolor="white", edgecolor=SYMBOL["neu"], linewidth=PT_FEIN, zorder=z)
         linie(ax, (x0, y0), (x1, y1), linewidth=PT_FEIN, color=SYMBOL["neu"], zorder=z)

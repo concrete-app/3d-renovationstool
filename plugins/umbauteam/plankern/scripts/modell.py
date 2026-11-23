@@ -18,8 +18,16 @@ from pathlib import Path
 
 STATUS = ("bestand", "abbruch", "neu")
 OEFFNUNGSTYPEN = ("tuer", "fenster", "durchgang")
-OBJEKTTYPEN = ("kueche", "wc", "lavabo", "dusche", "badewanne", "schrank",
+OBJEKTTYPEN = ("kueche", "unterschrank", "hochschrank", "oberschrank",
+               "wc", "lavabo", "dusche", "badewanne", "schrank",
                "waschturm", "bett", "tisch", "sofa", "andere")
+# Küchenelemente einzeln (statt Block «kueche»): mit Artikel aus bauteile-kueche.json
+KUECHENTYPEN = ("unterschrank", "hochschrank", "oberschrank")
+# Was in einem Küchenelement eingebaut ist (Symbol im Grundriss, Beschriftung in der Wandansicht)
+EINBAUTEN = ("spuele", "kochfeld", "backofen", "steamer", "geschirrspueler", "kuehlschrank",
+             "dampfabzug", "muldenlueftung")
+ARBEITSPLATTE = 4  # cm, liegt auf jedem Unterschrank (Arbeitshöhe = Unterschrank + Arbeitsplatte)
+SOCKEL = 6  # cm, unter Unter- und Hochschränken
 ZUSTAENDE = ("beide", "bestand", "neu")
 MASSSTAEBE = (20, 50, 100, 200)
 BLAETTER = ("grundriss", "schnitte", "ansichten", "raumansichten", "3d", "fotos", "visualisierung")
@@ -113,6 +121,18 @@ class Objekt:
     status: str
     hoehe: float
     bezeichnung: str
+    artikel: str = ""  # ID aus bauteile-kueche.json (= Position im Offerten-Tool), leer = ohne Artikel
+    montagehoehe: float = 0.0  # Unterkante über Boden (Oberschrank)
+    einbau: tuple[str, ...] = ()
+
+    @property
+    def z_unten(self) -> float:
+        return self.montagehoehe
+
+    @property
+    def z_oben(self) -> float:
+        """Oberkante; beim Unterschrank mit Arbeitsplatte."""
+        return self.montagehoehe + self.hoehe + (ARBEITSPLATTE if self.typ == "unterschrank" else 0)
 
 
 @dataclass
@@ -180,7 +200,7 @@ class Plan:
     blaetter: tuple[str, ...] = BLAETTER
 
 
-OBJEKTHOEHEN = {"kueche": 90, "wc": 40, "lavabo": 85, "dusche": 5, "badewanne": 60,
+OBJEKTHOEHEN = {"kueche": 90, "unterschrank": 89, "hochschrank": 209, "oberschrank": 63, "wc": 40, "lavabo": 85, "dusche": 5, "badewanne": 60,
                 "schrank": 220, "waschturm": 180, "bett": 45, "tisch": 75, "sofa": 80,
                 "andere": 100}
 
@@ -275,6 +295,14 @@ def _platzhalter(wert, pfad: str, gefunden: list[str]) -> None:
             _platzhalter(v, f"{pfad}[{i}]", gefunden)
 
 
+def bauteile_laden() -> dict[str, dict]:
+    """Bauteilkatalog (ohne Preise) aus dem Offerten-Tool: Artikel-ID → Eintrag. Fehlt die Datei: leer."""
+    datei = SKILL / "bauteile-kueche.json"
+    if not datei.is_file():
+        return {}
+    return {b["id"]: b for b in json.loads(datei.read_text(encoding="utf-8")).get("bauteile", [])}
+
+
 def firma_laden() -> dict:
     return json.loads((SKILL / "firma.json").read_text(encoding="utf-8"))
 
@@ -307,6 +335,7 @@ def pruefen(daten: dict, firma: dict | None = None, entwurf: bool = False,
     if not isinstance(daten, dict):
         raise Fehlerhaft(["Die Eingabe muss ein JSON-Objekt sein"])
     firma = firma_laden() if firma is None else firma
+    bauteile = bauteile_laden()
     pr = _Pruefer()
 
     p = daten.get("projekt") if isinstance(daten.get("projekt"), dict) else {}
@@ -443,17 +472,44 @@ def pruefen(daten: dict, firma: dict | None = None, entwurf: bool = False,
             if not isinstance(b, dict):
                 pr.maengel.append(f"{bp} muss ein Objekt sein")
                 continue
-            typ = pr.auswahl(b, "typ", bp, OBJEKTTYPEN)
+            artikel = pr.text(b, "artikel", bp, pflicht=False)
+            vorlage: dict = {}
+            if artikel:
+                vorlage = bauteile.get(artikel, {})
+                if not vorlage:
+                    pr.maengel.append(f"{bp}.artikel {artikel!r} gibt es im Bauteilkatalog nicht "
+                                      f"(bauteile-kueche.json); nur IDs von dort verwenden")
+                elif vorlage.get("typ") not in KUECHENTYPEN:
+                    pr.maengel.append(f"{bp}.artikel {artikel!r} ist {vorlage.get('typ')!r}, kein Element "
+                                      f"zum Zeichnen; Geräte als einbau eines Schranks angeben")
+                    vorlage = {}
+            # Masse aus dem Artikel sind Standard; eine abweichende Breite ist ein Widerspruch
+            mit = {k: v for k, v in vorlage.items() if k in ("typ", "breite", "tiefe", "hoehe", "montagehoehe", "einbau")}
+            for k in ("typ", "breite"):
+                if k in b and k in mit and b[k] != mit[k]:
+                    pr.maengel.append(f"{bp}.{k} {b[k]!r} passt nicht zu Artikel {artikel} ({mit[k]!r}); "
+                                      f"{k} weglassen oder anderen Artikel wählen")
+            d = {**mit, **b}
+            typ = pr.auswahl(d, "typ", bp, OBJEKTTYPEN)
+            kueche = typ in KUECHENTYPEN
+            einbau = pr.liste(d, "einbau", bp)
+            for e in einbau:
+                if e not in EINBAUTEN:
+                    pr.maengel.append(f"{bp}.einbau {e!r} muss eines von {', '.join(EINBAUTEN)} sein")
             geschoss.objekte.append(Objekt(
                 id=pr.text(b, "id", bp, pflicht=False, standard=f"{gid}-O{bi + 1}"),
                 typ=typ,
                 position=pr.punkt(b, "position", bp),
-                breite=pr.zahl(b, "breite", bp),
-                tiefe=pr.zahl(b, "tiefe", bp),
+                breite=pr.zahl(d, "breite", bp),
+                tiefe=pr.zahl(d, "tiefe", bp, standard=(35 if typ == "oberschrank" else 60) if kueche else None),
                 rotation=pr.zahl(b, "rotation", bp, standard=0, minimum=None, positiv=False),
                 status=pr.auswahl(b, "status", bp, STATUS, standard="neu"),
-                hoehe=pr.zahl(b, "hoehe", bp, standard=OBJEKTHOEHEN[typ]),
+                hoehe=pr.zahl(d, "hoehe", bp, standard=OBJEKTHOEHEN[typ]),
                 bezeichnung=pr.text(b, "bezeichnung", bp, pflicht=False),
+                artikel=artikel,
+                montagehoehe=pr.zahl(d, "montagehoehe", bp, standard=146 if typ == "oberschrank" else 0,
+                                     positiv=False),
+                einbau=tuple(e for e in einbau if e in EINBAUTEN),
             ))
         geschosse.append(geschoss)
 

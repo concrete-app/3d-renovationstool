@@ -179,9 +179,14 @@ class _Ifc:
         richtung = (math.cos(a), math.sin(a))
         ursprung = (b.position[0] - richtung[0] * b.breite / 2, b.position[1] - richtung[1] * b.breite / 2)
         klasse = "IfcSanitaryTerminal" if b.typ in SANITAER else "IfcFurniture"
-        self.element(klasse, b.bezeichnung or b.id, self.quader(b.breite, b.hoehe, b.tiefe),
-                     _matrix(ursprung, richtung, g.kote), ort, b.status,
-                     predefined=SANITAER.get(b.typ))
+        el = self.element(klasse, b.bezeichnung or b.id, self.quader(b.breite, b.z_oben - b.z_unten, b.tiefe),
+                          _matrix(ursprung, richtung, g.kote + b.z_unten), ort, b.status,
+                          predefined=SANITAER.get(b.typ))
+        if b.artikel or b.einbau:
+            api = ifcopenshell.api
+            pset = api.pset.add_pset(self.f, product=el, name="Umbauteam_Artikel")
+            api.pset.edit_pset(self.f, pset=pset, properties={
+                "Artikel": b.artikel, "Typ": b.typ, "Einbau": ", ".join(b.einbau)})
 
 
 def ifc_erzeugen(plan: Plan, ziel: Path) -> None:

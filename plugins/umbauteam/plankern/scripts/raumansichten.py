@@ -21,7 +21,7 @@ from grundriss import objekt_zeichnen, oeffnung_zeichnen, waende_zeichnen
 from modell import Fehlerhaft, Geschoss, Plan
 
 # Räume mit diesen Objekten bekommen immer ein Raumblatt, auch wenn alles bleibt
-NASS_UND_KUECHE = {"kueche", "wc", "lavabo", "dusche", "badewanne", "waschturm"}
+NASS_UND_KUECHE = {"kueche", "unterschrank", "hochschrank", "oberschrank", "wc", "lavabo", "dusche", "badewanne", "waschturm"}
 MASSSTAEBE = (20, 25, 50, 100)
 RAND_GRUNDRISS = 16.0  # mm um den Raumgrundriss: Masskette, Pfeile, Titel
 

@@ -145,8 +145,33 @@ def objekt_zeichnen(ax, b: Objekt) -> None:
         linie(ax, p(x0, y0), p(x1, y1), color=farbe, linestyle=strich, linewidth=PT_FEIN, zorder=5)
 
     hb, ht = B / 2, T / 2
+    if b.typ == "oberschrank":
+        # hängt über der Arbeitsfläche: nur gestrichelter Umriss (Projektion von oben)
+        q = [p(x, y) for x, y in [(-hb, -ht), (hb, -ht), (hb, ht), (-hb, ht)]]
+        ax.add_patch(plt.Polygon(q, closed=True, fill=False, edgecolor=farbe, linestyle=(0, (3, 2)),
+                                 linewidth=PT_FEIN, zorder=6))
+        if "dampfabzug" in b.einbau:
+            ax.text(*p(0, 0), "DA", ha="center", va="center", fontsize=5, color=farbe, zorder=7)
+        return
     poly([(-hb, -ht), (hb, -ht), (hb, ht), (-hb, ht)], linewidth=PT_MITTEL)
-    if b.typ == "kueche":
+    if b.typ in ("unterschrank", "hochschrank"):
+        if b.typ == "hochschrank":
+            strich_(-hb, -ht, hb, ht)
+            strich_(-hb, ht, hb, -ht)
+        if "spuele" in b.einbau:
+            bw = min(B - 10, 45)
+            poly([(-bw / 2, -ht + 10), (bw / 2, -ht + 10), (bw / 2, ht - 12), (-bw / 2, ht - 12)])
+            kreis(0, 0, 2.5)
+        if "kochfeld" in b.einbau or "muldenlueftung" in b.einbau:
+            for dx in (-B * 0.22, B * 0.22):
+                for dy in (-T * 0.2, T * 0.2):
+                    kreis(dx, dy, min(B, T) * 0.13)
+        kuerzel = [k for e, k in (("backofen", "BO"), ("steamer", "ST"), ("geschirrspueler", "GS"),
+                                  ("kuehlschrank", "KS")) if e in b.einbau]
+        if kuerzel and not b.bezeichnung:
+            ax.text(*p(0, ht * 0.55), " ".join(kuerzel), ha="center", va="center", fontsize=5,
+                    color=farbe, zorder=7)
+    elif b.typ == "kueche":
         poly([(-hb * 0.55 - 25, -ht + 8), (-hb * 0.55 + 25, -ht + 8),
               (-hb * 0.55 + 25, -ht + 48), (-hb * 0.55 - 25, -ht + 48)])
         for dx in (-13, 13):

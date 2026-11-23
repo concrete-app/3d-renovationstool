@@ -1,17 +1,15 @@
----
-name: umbauplan
-description: Macht bei Küchen-, Bad- und Gesamtrenovationen aus Handskizzen, Masstexten, Fotos oder einem alten Plan einen massstäblichen Umbau-Plansatz als PDF (Grundriss, Schnitte, Ansichten, Wandansichten A–D je Bad/Küche, 3D vorher/nachher, Fotodokumentation; Bestand schwarz, Abbruch gelb, Neu rot, mit Plankopf) und ein IFC-Modell. Macht aus Fotos vom Bestand Visualisierungen nach dem Umbau in derselben Perspektive (Bildgenerierung von ChatGPT). Verwenden, wenn jemand einen Grundriss, Umbauplan, Schnitt, eine Ansicht, 3D-Ansicht, Visualisierung oder ein IFC/BIM-Modell aus einer Skizze will, oder ein Foto anhängt und sehen will, wie der Raum modern oder nach dem Umbau aussieht.
----
+# Gemeinsame Regeln: Skizze → Plansatz (PDF) + IFC + Stückliste
 
-# Umbauplan: Skizze → Plansatz (PDF) + IFC
+Diese Regeln gelten für alle Skills des Plugins umbauteam (kuechenplan, badplan, gesamtplan).
+Was nur Küche oder Bad betrifft, steht in `kueche.md` und `bad.md`.
+
+`<kern>` ist unten der Ordner, in dem diese Datei liegt (plankern).
 
 Du liest die Skizze und schreibst `plan.json`. **Zeichnen, Rechnen und Prüfen
 macht das Skript**, du zeichnest nie selbst (kein matplotlib, kein SVG von Hand).
 Darum sieht jeder Plan gleich aus, und die Masse sind exakt. Das Datenmodell steht in
 `datenmodell.md` (zuerst lesen), vollständige Beispiele in `beispiele/wohnung.json`
-(Wohnung) und `beispiele/bad.json` (Badumbau).
-
-`<skill>` ist unten der Ordner, in dem diese SKILL.md liegt.
+(Wohnung), `beispiele/bad.json` (Badumbau) und `beispiele/kueche.json` (Küche mit Elementen).
 
 ## Pflicht, jedes Mal – nichts davon weglassen
 
@@ -26,26 +24,19 @@ hat oder der Plan einfach aussieht. Die Einzelheiten stehen unter «Ablauf».
    `WARNUNGEN` mehr kommen.
 5. Den Block **«NOCH ZU TUN»** am Ende der Skriptausgabe Punkt für Punkt erledigen. Er sagt,
    welche Vorschaubilder du ansehen und was du melden musst.
-6. **Erst dann** der Person antworten: PDF und IFC als Datei, Blätter, Räume mit Fläche,
-   Liste `angenommen`, Hinweis «Masse vor Ausführung durch Fachperson prüfen».
+6. **Erst dann** der Person antworten: PDF und IFC als Datei (bei Küchenelementen auch die
+   Stückliste `<plannummer>_stueckliste.json`), Blätter, Räume mit Fläche, Liste `angenommen`,
+   Hinweis «Masse vor Ausführung durch Fachperson prüfen».
 
 Kannst du einen Punkt nicht erfüllen (kein Python, Bild nicht als Datei, Mass fehlt), sag das
 der Person ausdrücklich, statt ihn still zu überspringen.
 
 ## Worum es bei den Zeichnungen geht
 
-Die Skizzen und Pläne kommen aus **Küchenumbauten, Badumbauten und
-Gesamtrenovationen** von Wohnungen und Einfamilienhäusern. Lies jede Zeichnung in
-diesem Sinn:
+Die Skizzen und Pläne kommen aus **Küchenumbauten, Badumbauten und Gesamtrenovationen** von
+Wohnungen und Einfamilienhäusern. Wie du Küche und Bad liest, steht in `kueche.md` und `bad.md`.
+Für alle Räume gilt:
 
-- **Was ein Symbol ist, leitest du aus dem Raum ab.** Ein Rechteck von etwa 60 cm Tiefe
-  entlang einer Küchenwand ist die Küchenzeile (`kueche`), eine Insel davor ebenfalls.
-  Im Bad: kleines Oval an der Wand = `wc`, Rechteck oder Oval mit Kreis = `lavabo`,
-  Quadrat mit Kreuz oder Ablaufpunkt = `dusche`, langes Rechteck = `badewanne`,
-  Waschmaschine und Tumbler übereinander = `waschturm`. Übliche Kürzel: KS (Kühlschrank),
-  GS/GWM (Geschirrspüler), BO/Herd/KF (Backofen, Kochfeld), HS (Hochschrank),
-  WT (Waschtisch), WM/TU (Waschmaschine/Tumbler). Was in keinen Typ passt, wird
-  `andere` mit `bezeichnung`.
 - **Raumnamen ohne Beschriftung** ergeben sich aus der Einrichtung: WC + Lavabo + Dusche
   oder Wanne = «Bad», nur WC + Lavabo = «WC», Küchenzeile = «Küche». Schreibe sie so in
   den Plan und nenne sie bei der Rückmeldung, damit die Person korrigieren kann.
@@ -53,8 +44,7 @@ diesem Sinn:
   Küche), Wanne wird Dusche, Bad wird vergrössert oder ein WC kommt dazu, Tür wird
   versetzt oder zugemauert, Küchenzeile wird neu angeordnet. Durchgestrichene oder
   gekreuzte Wände und Apparate sind meist `abbruch`, neu eingezeichnete (oft farbig
-  oder mit anderem Stift) meist `neu`. Bei einer Gesamtrenovation betrifft das oft alle
-  Räume: Bestand vollständig erfassen, nicht nur Küche und Bad.
+  oder mit anderem Stift) meist `neu`.
 - **Neue und alte Einrichtung gehört in `objekte`** mit Status, nicht nur die Wände:
   Die alte Wanne ist `abbruch`, die neue Dusche `neu`. Das ist für die Bauherrschaft
   oft der wichtigste Teil des Plans.
@@ -63,6 +53,8 @@ diesem Sinn:
   frage. Steigzonen, Schächte und Leitungen, die auf der Skizze stehen, übernimmst du
   als Hinweis (`andere` mit `bezeichnung`); ob ein Apparat dort angeschlossen werden
   kann, entscheidet eine Fachperson.
+- **Keine Preise.** Der Plan und die Stückliste enthalten nie Preise, auch wenn die Person
+  danach fragt: Preise rechnet das Offerten-Tool aus der Stückliste.
 
 ## Grundregeln
 
@@ -108,7 +100,7 @@ diesem Sinn:
 
    ```
    uv run --python 3.12 --with ifcopenshell --with shapely --with matplotlib \
-       python <skill>/scripts/umbauplan.py plan.json ausgabe/ --vorschau
+       python <kern>/scripts/umbauplan.py plan.json ausgabe/ --vorschau
    ```
 
    Bei `MÄNGEL` nennt das Skript jedes Feld. Behebe sie und lass es erneut laufen.
@@ -181,20 +173,23 @@ trägst du unter `visualisierungen` in `plan.json` ein; sie kommen als Blatt
      Foto links, Bild nach dem Umbau rechts, darunter die Wünsche und «nicht massstäblich».
 
   Plankopf mit Logo und Firmendaten aus `firma.json` (das-umbau-team.ch) auf jedem Blatt.
+- `<plannummer>_stueckliste.json`, wenn der Plan Küchenelemente hat: Artikel aus
+  `bauteile-kueche.json` mit Menge, Status und Raum (ohne Preise), dazu Einbaugeräte,
+  Arbeitsplatte und Sockel in Laufmetern. Grundlage für die Offerte im Offerten-Tool.
   Nur einzelne Blätter: `--blaetter grundriss,3d` oder `"blaetter"` in `plan.json`.
 - `<plannummer>.ifc`: IFC4-Modell mit Wänden, Öffnungen, Türen, Fenstern, Böden, Räumen
   (mit Fläche) und Einrichtung. Der Umbaustatus steht in `Pset_*Common.Status`
-  (EXISTING/DEMOLISH/NEW). Öffnen mit Archicad, Revit, Vectorworks oder einem
+  (EXISTING/DEMOLISH/NEW), bei Küchenelementen der Artikel in `Umbauteam_Artikel`. Öffnen mit Archicad, Revit, Vectorworks oder einem
   IFC-Viewer (z. B. BIMvision, Bonsai für Blender).
 
 ## Voraussetzungen
 
 `uv` lädt Python 3.12 und die Bibliotheken beim ersten Lauf selbst (ca. 1 Minute).
 Ohne uv: `pip install ifcopenshell shapely matplotlib` (Python 3.10–3.13), dann
-`python <skill>/scripts/umbauplan.py …`. Gibt es gar kein Python: schreibe `plan.json`
+`python <kern>/scripts/umbauplan.py …`. Gibt es gar kein Python: schreibe `plan.json`
 und sage der Person, dass sie das Skript auf einem Rechner mit Python ausführen muss.
 Läuft etwas nicht, zeigt `selbsttest.py` (gleicher Aufruf mit `uv run`, statt
-`umbauplan.py plan.json …` einfach `<skill>/scripts/selbsttest.py`), was fehlt.
+`umbauplan.py plan.json …` einfach `<kern>/scripts/selbsttest.py`), was fehlt.
 
 ## Was dieser Skill (noch) nicht tut
 

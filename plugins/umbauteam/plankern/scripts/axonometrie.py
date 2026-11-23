@@ -32,6 +32,8 @@ ELEVATION = 32.0       # Grad über dem Horizont
 FARBE = {"bestand": "#D4D4D4", "abbruch": "#FFD400", "neu": "#E0383C"}
 OBJEKT = {"bestand": "#F4F4F4", "abbruch": "#FFF1A6", "neu": "#F6B9BA"}
 BODEN = "#EDEDED"
+# Arbeitsplatte etwas dunkler als der Unterschrank, gleiche Statusfarbe
+ARBEITSPLATTE = {"bestand": "#D6D6D6", "abbruch": "#EBD56A", "neu": "#E58C8F"}
 GLAS = "#9CC9E8"
 EPS = 0.01
 
@@ -167,8 +169,11 @@ def szene(g: Geschoss, zustand: str) -> tuple[list[Koerper], list[Koerper], list
     for b in g.objekte:
         if b.status in gilt:
             grund = geometrie.objekt_polygon(b)
-            koerper.append(Koerper(grund, g.kote, g.kote + b.hoehe,
-                                   _prisma(grund, g.kote, g.kote + b.hoehe, OBJEKT[b.status])))
+            z0, z1 = g.kote + b.z_unten, g.kote + b.montagehoehe + b.hoehe
+            koerper.append(Koerper(grund, z0, z1, _prisma(grund, z0, z1, OBJEKT[b.status])))
+            if b.typ == "unterschrank":  # Arbeitsplatte als eigene Platte, damit die Kante sichtbar ist
+                koerper.append(Koerper(grund, z1, g.kote + b.z_oben,
+                                       _prisma(grund, z1, g.kote + b.z_oben, ARBEITSPLATTE[b.status])))
     namen = [(r.name, np.array([*r.beschriftungspunkt, g.kote + 2])) for r in geometrie.raeume(g, zustand)]
     return boden, koerper, namen
 

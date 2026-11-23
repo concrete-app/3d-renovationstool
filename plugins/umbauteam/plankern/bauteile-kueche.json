@@ -1,0 +1,423 @@
+{
+  "version": 1,
+  "katalog": "kueche",
+  "stand": "2026-11-23",
+  "hinweis": "Erzeugt vom Offerten-Tool (pnpm run bauteile-export). Nur Elemente und Masse in cm, vertrauliche Angaben bleiben im Offerten-Tool.",
+  "bauteile": [
+    {
+      "id": "KU-US-030",
+      "titel": "Unterschrank 30 cm, 2 Auszüge",
+      "typ": "unterschrank",
+      "breite": 30,
+      "tiefe": 60,
+      "hoehe": 89
+    },
+    {
+      "id": "KU-US-040",
+      "titel": "Unterschrank 40 cm, 2 Auszüge",
+      "typ": "unterschrank",
+      "breite": 40,
+      "tiefe": 60,
+      "hoehe": 89
+    },
+    {
+      "id": "KU-US-045",
+      "titel": "Unterschrank 45 cm, 2 Auszüge",
+      "typ": "unterschrank",
+      "breite": 45,
+      "tiefe": 60,
+      "hoehe": 89
+    },
+    {
+      "id": "KU-US-050",
+      "titel": "Unterschrank 50 cm, 2 Auszüge",
+      "typ": "unterschrank",
+      "breite": 50,
+      "tiefe": 60,
+      "hoehe": 89
+    },
+    {
+      "id": "KU-US-060",
+      "titel": "Unterschrank 60 cm, 2 Auszüge",
+      "typ": "unterschrank",
+      "breite": 60,
+      "tiefe": 60,
+      "hoehe": 89
+    },
+    {
+      "id": "KU-US-080",
+      "titel": "Unterschrank 80 cm, 2 Auszüge",
+      "typ": "unterschrank",
+      "breite": 80,
+      "tiefe": 60,
+      "hoehe": 89
+    },
+    {
+      "id": "KU-US-090",
+      "titel": "Unterschrank 90 cm, 2 Auszüge",
+      "typ": "unterschrank",
+      "breite": 90,
+      "tiefe": 60,
+      "hoehe": 89
+    },
+    {
+      "id": "KU-US-100",
+      "titel": "Unterschrank 100 cm, 2 Auszüge",
+      "typ": "unterschrank",
+      "breite": 100,
+      "tiefe": 60,
+      "hoehe": 89
+    },
+    {
+      "id": "KU-US-120",
+      "titel": "Unterschrank 120 cm, 2 Auszüge",
+      "typ": "unterschrank",
+      "breite": 120,
+      "tiefe": 60,
+      "hoehe": 89
+    },
+    {
+      "id": "KU-SP-060",
+      "titel": "Spülen-Unterschrank 60 cm",
+      "typ": "unterschrank",
+      "breite": 60,
+      "tiefe": 60,
+      "hoehe": 89,
+      "einbau": [
+        "spuele"
+      ]
+    },
+    {
+      "id": "KU-SP-080",
+      "titel": "Spülen-Unterschrank 80 cm",
+      "typ": "unterschrank",
+      "breite": 80,
+      "tiefe": 60,
+      "hoehe": 89,
+      "einbau": [
+        "spuele"
+      ]
+    },
+    {
+      "id": "KU-SP-090",
+      "titel": "Spülen-Unterschrank 90 cm",
+      "typ": "unterschrank",
+      "breite": 90,
+      "tiefe": 60,
+      "hoehe": 89,
+      "einbau": [
+        "spuele"
+      ]
+    },
+    {
+      "id": "KU-KF-060",
+      "titel": "Kochfeld-Unterschrank 60 cm",
+      "typ": "unterschrank",
+      "breite": 60,
+      "tiefe": 60,
+      "hoehe": 89,
+      "einbau": [
+        "kochfeld"
+      ]
+    },
+    {
+      "id": "KU-KF-080",
+      "titel": "Kochfeld-Unterschrank 80 cm",
+      "typ": "unterschrank",
+      "breite": 80,
+      "tiefe": 60,
+      "hoehe": 89,
+      "einbau": [
+        "kochfeld"
+      ]
+    },
+    {
+      "id": "KU-KF-090",
+      "titel": "Kochfeld-Unterschrank 90 cm",
+      "typ": "unterschrank",
+      "breite": 90,
+      "tiefe": 60,
+      "hoehe": 89,
+      "einbau": [
+        "kochfeld"
+      ]
+    },
+    {
+      "id": "KU-BU-060",
+      "titel": "Herd-Unterschrank 60 cm für Backofen",
+      "typ": "unterschrank",
+      "breite": 60,
+      "tiefe": 60,
+      "hoehe": 89,
+      "einbau": [
+        "backofen",
+        "kochfeld"
+      ]
+    },
+    {
+      "id": "KU-EU-110",
+      "titel": "Eck-Unterschrank 110 cm mit Drehböden",
+      "typ": "unterschrank",
+      "breite": 110,
+      "tiefe": 60,
+      "hoehe": 89
+    },
+    {
+      "id": "KU-EU-115",
+      "titel": "Eck-Unterschrank 115 cm mit Drehböden",
+      "typ": "unterschrank",
+      "breite": 115,
+      "tiefe": 60,
+      "hoehe": 89
+    },
+    {
+      "id": "KU-GS-060",
+      "titel": "Front für Geschirrspüler 60 cm",
+      "typ": "unterschrank",
+      "breite": 60,
+      "tiefe": 60,
+      "hoehe": 89,
+      "einbau": [
+        "geschirrspueler"
+      ]
+    },
+    {
+      "id": "KU-OS-030",
+      "titel": "Oberschrank 30 cm",
+      "typ": "oberschrank",
+      "breite": 30,
+      "tiefe": 35,
+      "hoehe": 63,
+      "montagehoehe": 146
+    },
+    {
+      "id": "KU-OS-040",
+      "titel": "Oberschrank 40 cm",
+      "typ": "oberschrank",
+      "breite": 40,
+      "tiefe": 35,
+      "hoehe": 63,
+      "montagehoehe": 146
+    },
+    {
+      "id": "KU-OS-045",
+      "titel": "Oberschrank 45 cm",
+      "typ": "oberschrank",
+      "breite": 45,
+      "tiefe": 35,
+      "hoehe": 63,
+      "montagehoehe": 146
+    },
+    {
+      "id": "KU-OS-050",
+      "titel": "Oberschrank 50 cm",
+      "typ": "oberschrank",
+      "breite": 50,
+      "tiefe": 35,
+      "hoehe": 63,
+      "montagehoehe": 146
+    },
+    {
+      "id": "KU-OS-060",
+      "titel": "Oberschrank 60 cm",
+      "typ": "oberschrank",
+      "breite": 60,
+      "tiefe": 35,
+      "hoehe": 63,
+      "montagehoehe": 146
+    },
+    {
+      "id": "KU-OS-080",
+      "titel": "Oberschrank 80 cm",
+      "typ": "oberschrank",
+      "breite": 80,
+      "tiefe": 35,
+      "hoehe": 63,
+      "montagehoehe": 146
+    },
+    {
+      "id": "KU-OS-090",
+      "titel": "Oberschrank 90 cm",
+      "typ": "oberschrank",
+      "breite": 90,
+      "tiefe": 35,
+      "hoehe": 63,
+      "montagehoehe": 146
+    },
+    {
+      "id": "KU-OS-100",
+      "titel": "Oberschrank 100 cm",
+      "typ": "oberschrank",
+      "breite": 100,
+      "tiefe": 35,
+      "hoehe": 63,
+      "montagehoehe": 146
+    },
+    {
+      "id": "KU-OS-120",
+      "titel": "Oberschrank 120 cm",
+      "typ": "oberschrank",
+      "breite": 120,
+      "tiefe": 35,
+      "hoehe": 63,
+      "montagehoehe": 146
+    },
+    {
+      "id": "KU-DA-060",
+      "titel": "Dunsthauben-Oberschrank 60 cm",
+      "typ": "oberschrank",
+      "breite": 60,
+      "tiefe": 35,
+      "hoehe": 63,
+      "montagehoehe": 146,
+      "einbau": [
+        "dampfabzug"
+      ]
+    },
+    {
+      "id": "KU-HS-045",
+      "titel": "Hochschrank 45 cm",
+      "typ": "hochschrank",
+      "breite": 45,
+      "tiefe": 60,
+      "hoehe": 209
+    },
+    {
+      "id": "KU-HS-050",
+      "titel": "Hochschrank 50 cm",
+      "typ": "hochschrank",
+      "breite": 50,
+      "tiefe": 60,
+      "hoehe": 209
+    },
+    {
+      "id": "KU-HS-060",
+      "titel": "Hochschrank 60 cm",
+      "typ": "hochschrank",
+      "breite": 60,
+      "tiefe": 60,
+      "hoehe": 209
+    },
+    {
+      "id": "KU-HK-060",
+      "titel": "Geräte-Hochschrank 60 cm für Kühlschrank",
+      "typ": "hochschrank",
+      "breite": 60,
+      "tiefe": 60,
+      "hoehe": 209,
+      "einbau": [
+        "kuehlschrank"
+      ]
+    },
+    {
+      "id": "KU-HBK-060",
+      "titel": "Geräte-Hochschrank 60 cm für Backofen und Kühlschrank",
+      "typ": "hochschrank",
+      "breite": 60,
+      "tiefe": 60,
+      "hoehe": 209,
+      "einbau": [
+        "backofen",
+        "kuehlschrank"
+      ]
+    },
+    {
+      "id": "KU-HB-060",
+      "titel": "Geräte-Hochschrank 60 cm für Backofen",
+      "typ": "hochschrank",
+      "breite": 60,
+      "tiefe": 60,
+      "hoehe": 209,
+      "einbau": [
+        "backofen"
+      ]
+    },
+    {
+      "id": "KU-AP-010",
+      "titel": "Arbeitsplatte Schichtstoff",
+      "typ": "arbeitsplatte",
+      "tiefe": 60,
+      "hoehe": 4,
+      "montagehoehe": 89
+    },
+    {
+      "id": "KU-SO-010",
+      "titel": "Sockelblende",
+      "typ": "sockel",
+      "tiefe": 2,
+      "hoehe": 6
+    },
+    {
+      "id": "KU-GE-010",
+      "titel": "Kühlschrank Einbau",
+      "typ": "geraet",
+      "einbau": [
+        "kuehlschrank"
+      ]
+    },
+    {
+      "id": "KU-GE-020",
+      "titel": "Backofen Einbau",
+      "typ": "geraet",
+      "einbau": [
+        "backofen"
+      ]
+    },
+    {
+      "id": "KU-GE-030",
+      "titel": "Steamer Einbau",
+      "typ": "geraet",
+      "einbau": [
+        "steamer"
+      ]
+    },
+    {
+      "id": "KU-GE-040",
+      "titel": "Kochfeld Induktion",
+      "typ": "geraet",
+      "einbau": [
+        "kochfeld"
+      ]
+    },
+    {
+      "id": "KU-GE-050",
+      "titel": "Dampfabzug Flachschirmhaube",
+      "typ": "geraet",
+      "einbau": [
+        "dampfabzug"
+      ]
+    },
+    {
+      "id": "KU-GE-060",
+      "titel": "Muldenlüftung",
+      "typ": "geraet",
+      "einbau": [
+        "muldenlueftung"
+      ]
+    },
+    {
+      "id": "KU-GE-070",
+      "titel": "Geschirrspüler vollintegriert",
+      "typ": "geraet",
+      "einbau": [
+        "geschirrspueler"
+      ]
+    },
+    {
+      "id": "KU-GE-080",
+      "titel": "Spüle Edelstahl",
+      "typ": "geraet",
+      "einbau": [
+        "spuele"
+      ]
+    },
+    {
+      "id": "KU-GE-090",
+      "titel": "Küchenarmatur",
+      "typ": "geraet",
+      "einbau": [
+        "armatur"
+      ]
+    }
+  ]
+}

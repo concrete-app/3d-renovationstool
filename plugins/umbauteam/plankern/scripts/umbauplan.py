@@ -43,6 +43,8 @@ class Ergebnis:
     ifc: Path | None                               # None: ifcopenshell fehlt
     blaetter: list = field(default_factory=list)   # pdf.Erzeugt je Blatt
     vorschauen: list[Path] = field(default_factory=list)
+    stueckliste: Path | None = None                # nur mit Küchenelementen
+    ohne_artikel: list[str] = field(default_factory=list)
 
 
 def erzeugen(plan, ausgabe: Path, entwurf: bool = False, vorschau: bool = False) -> Ergebnis:
@@ -63,7 +65,11 @@ def erzeugen(plan, ausgabe: Path, entwurf: bool = False, vorschau: bool = False)
         ifc = ausgabe / f"{stamm}.ifc"
         ifc_erzeugen(plan, ifc)
     vorschauen = [png.with_name(f"{png.stem}_{b.kurz}.png") for b in blaetter] if png else []
-    return Ergebnis(pdf=pdf, ifc=ifc, blaetter=blaetter, vorschauen=vorschauen)
+    import stueckliste
+    liste = ausgabe / f"{stamm}_stueckliste.json"
+    daten = stueckliste.schreiben(plan, liste)
+    return Ergebnis(pdf=pdf, ifc=ifc, blaetter=blaetter, vorschauen=vorschauen,
+                    stueckliste=liste if daten else None, ohne_artikel=(daten or {}).get("ohne_artikel", []))
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -131,6 +137,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  {erg.ifc}")
     else:
         print("  KEIN IFC: ifcopenshell fehlt (pip install ifcopenshell). Die PDF ist vollständig.")
+    if erg.stueckliste:
+        print(f"  {erg.stueckliste} (Stückliste für die Offerte, ohne Preise)")
     if erg.vorschauen:
         print("Vorschau:")
         for v in erg.vorschauen:
@@ -158,9 +166,14 @@ def noch_zu_tun(plan, erg: Ergebnis, warnungen: list[str]) -> None:
         punkte.append(f"Es gibt {len(fotos)} Foto(s), aber keine Visualisierung: pro Foto ein Bild nach dem "
                       "Umbau erzeugen, unter visualisierungen eintragen, neu erzeugen (visualisierung.md). "
                       "Geht das nicht, der Person sagen, dass die Visualisierung fehlt.")
+    if erg.ohne_artikel:
+        punkte.append(f"{len(erg.ohne_artikel)} Küchenelement(e) ohne artikel (fehlen in der Stückliste): "
+                      + "; ".join(erg.ohne_artikel) + ". Passenden Artikel aus bauteile-kueche.json eintragen "
+                      "oder der Person sagen, dass sie fehlen.")
     if plan.angenommen:
         punkte.append(f"Der Person alle {len(plan.angenommen)} Annahmen nennen (Liste «Angenommen» oben).")
-    punkte.append("Der Person melden: PDF" + (" und IFC" if erg.ifc else "") + " als Datei, Liste der "
+    punkte.append("Der Person melden: PDF" + (" und IFC" if erg.ifc else "") + (" und Stückliste" if erg.stueckliste else "")
+                  + " als Datei, Liste der "
                   f"{len(erg.blaetter)} Blätter, Räume mit Fläche (aus dieser Ausgabe), und dass eine "
                   "Fachperson die Masse vor der Ausführung prüfen muss.")
     print("\nNOCH ZU TUN, bevor du antwortest (Pflicht, nichts auslassen):")

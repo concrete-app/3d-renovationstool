@@ -1,4 +1,4 @@
-"""Der umbauplan-Skill: Prüfung, Geometrie, Massstab und IFC.
+"""Der gemeinsame Planskern der Skills kuechenplan, badplan, gesamtplan: Prüfung, Geometrie, Massstab und IFC.
 
 Getestet wird, was niemand sieht, bis es auf der Baustelle falsch ist: eine
 Fläche, ein Massstab, ein Umbaustatus im IFC. Wie der Plan aussieht, prüft man
@@ -15,8 +15,7 @@ from pathlib import Path
 
 import pytest
 
-SKILL = (Path(__file__).resolve().parent.parent / "plugins" / "umbauplan"
-         / "skills" / "umbauplan")
+SKILL = Path(__file__).resolve().parent.parent / "plugins" / "umbauteam" / "plankern"
 sys.path.insert(0, str(SKILL / "scripts"))
 
 import geometrie                                                # noqa: E402
@@ -604,3 +603,68 @@ def test_beispiel_bleibt_unveraendert():
     vorher = copy.deepcopy(d)
     pruefen(d)
     assert d == vorher
+
+
+# --- Küche: Elemente aus dem Bauteilkatalog, Stückliste --------------------
+
+def kueche() -> dict:
+    return json.loads((SKILL / "beispiele" / "kueche.json").read_text(encoding="utf-8"))
+
+
+def test_bauteilkatalog_ohne_preise():
+    text = (SKILL / "bauteile-kueche.json").read_text(encoding="utf-8").lower()
+    for wort in ("preis", "ebit", "marge", "lieferant", "bestellnummer"):
+        assert wort not in text
+
+
+def test_kueche_artikel_setzt_masse():
+    plan = pruefen(kueche())
+    objekte = {b.artikel: b for b in plan.geschosse[0].objekte if b.artikel}
+    us = objekte["KU-US-060"]
+    assert (us.typ, us.breite, us.tiefe, us.hoehe, us.montagehoehe) == ("unterschrank", 60, 60, 89, 0)
+    assert us.z_oben == 89 + modell.ARBEITSPLATTE
+    os_ = objekte["KU-OS-080"]
+    assert (os_.typ, os_.montagehoehe, os_.z_oben) == ("oberschrank", 146, 209)
+    assert objekte["KU-HK-060"].einbau == ("kuehlschrank",)
+    assert objekte["KU-HK-060"].z_oben == objekte["KU-OS-080"].z_oben  # Oberkanten bündig
+
+
+def test_kueche_maengel():
+    d = kueche()
+    d["geschosse"][0]["objekte"].append({"artikel": "KU-XX-999", "position": [100, 100], "status": "neu"})
+    assert "gibt es im Bauteilkatalog nicht" in maengel(d)
+    d = kueche()
+    d["geschosse"][0]["objekte"].append({"artikel": "KU-US-060", "breite": 55, "position": [100, 100]})
+    assert "passt nicht zu Artikel" in maengel(d)
+    d = kueche()
+    d["geschosse"][0]["objekte"].append({"artikel": "KU-GE-040", "position": [100, 100]})
+    assert "kein Element" in maengel(d)
+    d = kueche()
+    d["geschosse"][0]["objekte"].append({"typ": "unterschrank", "breite": 60, "position": [100, 100],
+                                         "einbau": ["fritteuse"]})
+    assert "einbau 'fritteuse'" in maengel(d)
+
+
+def test_kueche_stueckliste():
+    import stueckliste
+    liste = stueckliste.stueckliste(pruefen(kueche()))
+    menge = {(z["artikel"], z["status"]): z["menge"] for z in liste["positionen"]}
+    assert menge[("KU-US-060", "neu")] == 2
+    assert menge[("KU-OS-060", "neu")] == 3
+    assert menge[("KU-GE-040", "neu")] == 1          # Kochfeld aus einbau
+    assert menge[("KU-GE-010", "neu")] == 1          # Kühlschrank im Hochschrank
+    # Arbeitsplatte: Unterschränke 60 + 60 + 60 + 80 + 60 cm; Sockel zusätzlich 2 Hochschränke à 60
+    assert menge[("KU-AP-010", "neu")] == 3.2
+    assert menge[("KU-SO-010", "neu")] == 4.4
+    assert all(z["raum"] == "Küche" for z in liste["positionen"])
+    assert liste["ohne_artikel"] == []
+    assert "preis" not in json.dumps(liste).lower()
+
+
+def test_kueche_plansatz(tmp_path):
+    pytest.importorskip("matplotlib")
+    import umbauplan
+    (tmp_path / "plan.json").write_text(json.dumps(kueche()), encoding="utf-8")
+    assert umbauplan.main([str(tmp_path / "plan.json"), str(tmp_path / "aus"), "--entwurf"]) == 0
+    assert (tmp_path / "aus" / "K-001_stueckliste.json").is_file()
+    assert (tmp_path / "aus" / "K-001_umbau.pdf").is_file()

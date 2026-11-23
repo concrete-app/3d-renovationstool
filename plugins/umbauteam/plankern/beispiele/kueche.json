@@ -1,0 +1,59 @@
+{
+  "projekt": {
+    "name": "Beispiel: Küchenumbau, Küchenzeile neu",
+    "adresse": "Musterstrasse 5, 8000 Zürich",
+    "bauherr": "Beispiel",
+    "plannummer": "K-001",
+    "datum": "2026-11-23",
+    "gezeichnet": "kuechenplan",
+    "index": "A",
+    "massstab": 50,
+    "nordwinkel": 0
+  },
+  "geschosse": [
+    {
+      "id": "EG",
+      "name": "Erdgeschoss",
+      "kote": 0,
+      "raumhoehe": 250,
+      "deckenstaerke": 20,
+      "waende": [
+        { "id": "W1", "von": [0, 0], "bis": [480, 0], "dicke": 30, "status": "bestand" },
+        { "id": "W2", "von": [480, 0], "bis": [480, 360], "dicke": 30, "status": "bestand" },
+        { "id": "W3", "von": [480, 360], "bis": [0, 360], "dicke": 30, "status": "bestand" },
+        { "id": "W4", "von": [0, 360], "bis": [0, 0], "dicke": 30, "status": "bestand" }
+      ],
+      "oeffnungen": [
+        { "id": "T1", "wand": "W1", "typ": "tuer", "abstand": 60, "breite": 90, "hoehe": 210, "status": "bestand", "anschlag": "anfang", "seite": "links" },
+        { "id": "F1", "wand": "W2", "typ": "fenster", "abstand": 80, "breite": 120, "hoehe": 120, "bruestung": 100, "status": "bestand" }
+      ],
+      "raeume": [
+        { "name": "Küche", "punkt": [240, 150] }
+      ],
+      "objekte": [
+        { "typ": "kueche", "position": [225, 315], "breite": 420, "tiefe": 60, "rotation": 180, "status": "abbruch", "bezeichnung": "Küche alt" },
+
+        { "artikel": "KU-HK-060", "position": [45, 315], "rotation": 180, "status": "neu" },
+        { "artikel": "KU-HB-060", "position": [105, 315], "rotation": 180, "status": "neu" },
+        { "artikel": "KU-US-060", "position": [165, 315], "rotation": 180, "status": "neu" },
+        { "artikel": "KU-KF-060", "position": [225, 315], "rotation": 180, "status": "neu", "einbau": ["kochfeld"] },
+        { "artikel": "KU-US-060", "position": [285, 315], "rotation": 180, "status": "neu" },
+        { "artikel": "KU-SP-080", "position": [355, 315], "rotation": 180, "status": "neu" },
+        { "artikel": "KU-GS-060", "position": [425, 315], "rotation": 180, "status": "neu" },
+
+        { "artikel": "KU-OS-060", "position": [165, 327.5], "rotation": 180, "status": "neu" },
+        { "artikel": "KU-DA-060", "position": [225, 327.5], "rotation": 180, "status": "neu" },
+        { "artikel": "KU-OS-060", "position": [285, 327.5], "rotation": 180, "status": "neu" },
+        { "artikel": "KU-OS-080", "position": [355, 327.5], "rotation": 180, "status": "neu" },
+        { "artikel": "KU-OS-060", "position": [425, 327.5], "rotation": 180, "status": "neu" },
+
+        { "typ": "tisch", "position": [240, 120], "breite": 140, "tiefe": 80, "status": "bestand" }
+      ]
+    }
+  ],
+  "raumansichten": ["Küche"],
+  "angenommen": [
+    "Alle Masse sind Beispielmasse, nicht gemessen",
+    "Raumhöhe 2.50 (Standardwert)"
+  ]
+}

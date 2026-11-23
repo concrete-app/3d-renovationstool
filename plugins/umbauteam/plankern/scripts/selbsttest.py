@@ -110,9 +110,9 @@ def main(argv: list[str] | None = None) -> int:
         hat_pypdf = False
 
     # --- Skill-Ordner, Firma, Logo, Schrift -----------------------------------
-    for datei in ("SKILL.md", "firma.json", "beispiele/bad.json", "scripts/umbauplan.py"):
+    for datei in ("regeln.md", "firma.json", "beispiele/bad.json", "scripts/umbauplan.py"):
         b.pruefe((SKILL / datei).is_file(), f"{datei} gefunden",
-                 "Skill-Ordner unvollständig: ganzen Ordner mit allen Dateien kopieren")
+                 "Ordner plankern unvollständig: ganzen Ordner mit allen Dateien kopieren")
     firma = firma_laden()
     platzhalter: list[str] = []
     _platzhalter(firma, "firma.json", platzhalter)

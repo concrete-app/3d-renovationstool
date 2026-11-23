@@ -106,12 +106,25 @@ setze einen eigenen Punkt mit `zustand: "neu"` und gib den alten Räumen `zustan
 ```json
 { "typ": "wc", "position": [400, 755], "breite": 40, "tiefe": 60, "rotation": 180, "status": "bestand" }
 ```
-- `typ`: `kueche`, `wc`, `lavabo`, `dusche`, `badewanne`, `schrank`, `waschturm`,
-  `bett`, `tisch`, `sofa`, `andere`.
+- `typ`: `kueche` (Block, für bestehende Küchen), `unterschrank`, `hochschrank`, `oberschrank`,
+  `wc`, `lavabo`, `dusche`, `badewanne`, `schrank`, `waschturm`, `bett`, `tisch`, `sofa`, `andere`.
 - `position`: **Mitte** des Objekts. `breite` entlang der Wand, `tiefe` von der Wand weg.
 - `rotation` in Grad, gegen den Uhrzeigersinn. Bei `0` steht die Rückseite unten (y klein),
   also an einer Wand unterhalb. `90`: Rückseite rechts, `180`: oben, `270`: links.
 - `bezeichnung` (optional): Text im Symbol.
+
+Küchenelemente (siehe `kueche.md`):
+
+```json
+{ "artikel": "KU-SP-080", "position": [355, 315], "rotation": 180, "status": "neu" }
+```
+- `artikel`: ID aus `bauteile-kueche.json`. Setzt `typ`, `breite`, `tiefe`, `hoehe`,
+  `montagehoehe` und `einbau`; diese dann weglassen. Eine andere `breite` als der Artikel ist ein Mangel.
+- `montagehoehe` (cm): Unterkante über Boden, Standard 146 beim Oberschrank, sonst 0.
+- `einbau`: Liste aus `spuele`, `kochfeld`, `backofen`, `steamer`, `geschirrspueler`,
+  `kuehlschrank`, `dampfabzug`, `muldenlueftung`.
+- Ohne `artikel` geht ein Küchenelement auch (`typ` und `breite` angeben), fehlt dann aber in der
+  Stückliste unter `ohne_artikel`.
 
 ## schnitte[] (oben, neben projekt, optional)
 
@@ -179,6 +192,7 @@ Nur verwenden, wenn die Person ausdrücklich zustimmt, und dann in `angenommen` 
 | Wohnungstür | 100 × 210 |
 | Fenster | Brüstung 90 |
 | Küche (Tiefe) | 60 |
+| Unterschrank / Hochschrank / Oberschrank (Höhe) | 89 / 209 / 63 ab 146 |
 | WC | 40 × 60 |
 | Lavabo | 60 × 45 |
 | Dusche | 90 × 90 |
