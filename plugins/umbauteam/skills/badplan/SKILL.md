@@ -19,6 +19,11 @@ Für **Bad- und WC-Umbauten**.
 
 ## Kurz
 
+- **Ergebnis ist genau eine PDF aus `<kern>/scripts/umbauplan.py`** für das Projekt der Person:
+  keine eigene PDF, keine angehängten Seiten oder Links. Was nicht klappt: Tabelle
+  «Wenn etwas nicht klappt» in `<kern>/regeln.md` befolgen.
+- **Beispiele (`<kern>/beispiele/`) nie als Projekt zeichnen.** Skizze als PDF/Scan:
+  `python <kern>/scripts/seiten.py datei.pdf`, dann jede Seite ansehen.
 - Masse und Status (bleibt / weg / neu) von der Skizze oder erfragen, nie schätzen.
 - Alle Apparate alt und neu unter `objekte` (alte Wanne `abbruch`, neue Dusche `neu`).
 - Erzeugen mit

@@ -105,6 +105,7 @@ plugins/umbauteam/plankern/
     ifc_export.py     IFC4 mit Umbaustatus und Artikel
     umbauplan.py      Kommandozeile
     selbsttest.py     prüft Umgebung und erzeugt den Beispiel-Plansatz
+    seiten.py         PDF (Scan, Situationsaufnahme) → PNG pro Seite zum Ansehen
 tests/                Tests für die Skripte
 ```
 
@@ -120,7 +121,7 @@ Offerten-Tool, dort `pnpm run bauteile-export` laufen lassen, Version hier erhö
 ```
 uv run --python 3.12 --with ifcopenshell --with shapely --with matplotlib \
     python plugins/umbauteam/plankern/scripts/umbauplan.py \
-    plugins/umbauteam/plankern/beispiele/wohnung.json ausgabe/ --entwurf --vorschau
+    plugins/umbauteam/plankern/beispiele/wohnung.json ausgabe/ --entwurf --vorschau --beispiel
 ```
 
 ## Tests

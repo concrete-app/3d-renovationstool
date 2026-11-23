@@ -21,6 +21,11 @@ Für **Gesamtrenovationen**: alle Räume, auch die, die bleiben.
 
 ## Kurz
 
+- **Ergebnis ist genau eine PDF aus `<kern>/scripts/umbauplan.py`** für das Projekt der Person:
+  keine eigene PDF, keine angehängten Seiten oder Links. Was nicht klappt: Tabelle
+  «Wenn etwas nicht klappt» in `<kern>/regeln.md` befolgen.
+- **Beispiele (`<kern>/beispiele/`) nie als Projekt zeichnen.** Skizze als PDF/Scan:
+  `python <kern>/scripts/seiten.py datei.pdf`, dann jede Seite ansehen.
 - Bestand vollständig erfassen: alle Wände, Öffnungen und Räume, nicht nur Küche und Bad.
 - Wände, die wegkommen, `abbruch`; neue Wände `neu`; zusammengelegte Räume mit eigenem
   Raumpunkt `zustand: "neu"`. Ob eine Wand tragend ist, entscheidet eine Fachperson.

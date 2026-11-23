@@ -15,7 +15,8 @@ in den Plansatz.
    `sips -s format jpeg bild.heic --out bild.jpg`. Das Foto gehört in den Arbeitsordner
    neben `plan.json`, z. B. `/mnt/data/fotos/kueche.jpg` (angehängte Dateien liegen in
    ChatGPT schon in `/mnt/data/`).
-2. **Was ändert sich?** Gibt es schon `plan.json`, nimm aus dem Raum, den das Foto zeigt,
+2. **Was ändert sich?** Das Bild zeigt immer dieselbe Variante wie `plan.json`. Will die
+   Person etwas anderes (z. B. Wanne bleibt), ändere zuerst `plan.json`. Gibt es schon `plan.json`, nimm aus dem Raum, den das Foto zeigt,
    die Objekte und Wände mit Status `abbruch` (verschwindet) und `neu` (kommt dazu).
    Bei einer Küche mit Elementen (`artikel`) beschreibst du die neue Zeile von links nach
    rechts aus den Elementen, wie sie im Foto stehen: Hochschränke mit Geräten, Unterschränke

@@ -1,6 +1,6 @@
 {
   "name": "umbauteam",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Umbau-Plansätze für das Umbau-Team: kuechenplan, badplan und gesamtplan machen aus Skizzen, Massen und Fotos einen massstäblichen Plansatz (PDF: Grundriss, Schnitte, Ansichten, Wandansichten A–D, 3D vorher/nachher, Visualisierung, Fotos; Bestand/Abbruch/Neu), ein IFC-Modell und eine Stückliste für die Offerte.",
   "author": { "name": "AKUBA GmbH | das-umbau-team.ch" }
 }

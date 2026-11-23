@@ -2,7 +2,7 @@
 """Erzeugt aus plan.json die Umbaupläne (eine PDF) und das IFC-Modell.
 
     python umbauplan.py plan.json ausgabe/ [--blaetter grundriss,schnitte,...]
-                        [--entwurf] [--vorschau] [--nur-pruefen]
+                        [--entwurf] [--vorschau] [--nur-pruefen] [--beispiel]
 
 Die PDF enthält Grundrisse, Schnitte, Ansichten, 3D vorher/nachher, Visualisierungen und Fotos
 (was davon, steht in plan.json unter "blaetter" oder in --blaetter).
@@ -16,7 +16,8 @@ Braucht shapely, matplotlib und Pillow, für das IFC zusätzlich ifcopenshell
 Mängel (Exit-Code 1) nennen das Feld; Warnungen stoppen nichts, sollten aber
 angeschaut werden. --entwurf erlaubt Platzhalter wie <PLZ Ort> und schreibt
 «ENTWURF» auf den Plan. --vorschau legt pro Blatt ein PNG daneben, damit
-man die Pläne ansehen kann, ohne die PDF zu öffnen.
+man die Pläne ansehen kann, ohne die PDF zu öffnen. Pläne aus beispiele/ (Projektname
+«Beispiel…») zeichnet das Skript nur mit --beispiel: Sie sind nie das Projekt der Person.
 """
 
 from __future__ import annotations
@@ -72,6 +73,10 @@ def erzeugen(plan, ausgabe: Path, entwurf: bool = False, vorschau: bool = False)
                     stueckliste=liste if daten else None, ohne_artikel=(daten or {}).get("ohne_artikel", []))
 
 
+def ist_beispiel(plan) -> bool:
+    return plan.projekt.name.strip().lower().startswith("beispiel")
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("eingabe", type=Path)
@@ -80,6 +85,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--vorschau", action="store_true", help="zusätzlich PNG pro Blatt")
     ap.add_argument("--blaetter", help=f"nur diese Blätter, mit Komma: {','.join(BLAETTER)}")
     ap.add_argument("--nur-pruefen", action="store_true", help="nur prüfen, nichts erzeugen")
+    ap.add_argument("--beispiel", action="store_true", help="einen Plan aus beispiele/ zeichnen (nur zum Testen)")
     args = ap.parse_args(argv)
 
     try:
@@ -91,6 +97,13 @@ def main(argv: list[str] | None = None) -> int:
         print(f"MÄNGEL ({len(e.maengel)}), nichts erzeugt:")
         for mangel in e.maengel:
             print(f"  - {mangel}")
+        return 1
+
+    if ist_beispiel(plan) and not args.beispiel:
+        print("MÄNGEL (1), nichts erzeugt:")
+        print(f"  - Das ist ein Beispielplan aus beispiele/ ({plan.projekt.name!r}), nicht das Projekt der "
+              "Person. Schreibe plan.json aus ihrer Skizze und ihren Massen. Sind die Masse nicht lesbar, "
+              "frage nach den fehlenden Massen; zeichne nie stattdessen ein Beispiel.")
         return 1
 
     warnungen = [h for g in plan.geschosse for h in geometrie.warnungen(g)]

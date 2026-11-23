@@ -517,7 +517,7 @@ def test_ausgabe_endet_mit_noch_zu_tun(tmp_path, capsys):
     d["fotos"] = [{"datei": "bad.jpg"}]
     d["blaetter"] = ["grundriss", "fotos"]
     (tmp_path / "plan.json").write_text(json.dumps(d), encoding="utf-8")
-    assert umbauplan.main([str(tmp_path / "plan.json"), str(tmp_path / "aus"), "--vorschau"]) == 0
+    assert umbauplan.main([str(tmp_path / "plan.json"), str(tmp_path / "aus"), "--vorschau", "--beispiel"]) == 0
     rest = capsys.readouterr().out.split("NOCH ZU TUN")[1]
     assert "B-002_vorschau_OG.png" in rest and "keine Visualisierung" in rest
     assert "3 Annahmen" in rest and "Fachperson" in rest
@@ -665,7 +665,7 @@ def test_kueche_plansatz(tmp_path):
     pytest.importorskip("matplotlib")
     import umbauplan
     (tmp_path / "plan.json").write_text(json.dumps(kueche()), encoding="utf-8")
-    assert umbauplan.main([str(tmp_path / "plan.json"), str(tmp_path / "aus"), "--entwurf"]) == 0
+    assert umbauplan.main([str(tmp_path / "plan.json"), str(tmp_path / "aus"), "--entwurf", "--beispiel"]) == 0
     assert (tmp_path / "aus" / "K-001_stueckliste.json").is_file()
     assert (tmp_path / "aus" / "K-001_umbau.pdf").is_file()
 
@@ -682,3 +682,38 @@ def test_skill_verweist_auf_vorhandene_dateien(name):
     assert text.startswith(f"---\nname: {name}\n")
     for datei in set(re.findall(r"<kern>/([\w./-]+\.(?:md|json|py))", text)):
         assert (SKILL / datei).is_file(), f"{name}: {datei} fehlt"
+
+
+# --- Schutz vor Ersatzlösungen --------------------------------------------
+
+def test_beispielplan_wird_ohne_schalter_abgelehnt(tmp_path, capsys):
+    import umbauplan
+    plan = tmp_path / "plan.json"
+    plan.write_text((SKILL / "beispiele" / "bad.json").read_text(encoding="utf-8"), encoding="utf-8")
+    assert umbauplan.main([str(plan), str(tmp_path / "aus")]) == 1
+    assert "Beispielplan aus beispiele/" in capsys.readouterr().out
+    assert not (tmp_path / "aus").exists()
+    d = json.loads(plan.read_text(encoding="utf-8"))
+    d["projekt"]["name"] = "Bad Hegglin, Wanne wird Dusche"
+    plan.write_text(json.dumps(d), encoding="utf-8")
+    assert umbauplan.main([str(plan), str(tmp_path / "aus"), "--blaetter", "grundriss"]) == 0
+
+
+def test_seiten_macht_png_pro_seite(tmp_path):
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.backends.backend_pdf import PdfPages
+    import seiten
+    pdf = tmp_path / "aufnahme.pdf"
+    with PdfPages(pdf) as pp:
+        for i in range(3):
+            fig = plt.figure(figsize=(4, 3))
+            fig.text(0.5, 0.5, f"Seite {i + 1}")
+            pp.savefig(fig)
+            plt.close(fig)
+    try:
+        pfade = seiten.seiten(pdf, tmp_path / "png", dpi=72)
+    except RuntimeError:
+        pytest.skip("kein PDF-Renderer installiert")
+    assert len(pfade) == 3 and all(p.suffix == ".png" and p.stat().st_size > 0 for p in pfade)

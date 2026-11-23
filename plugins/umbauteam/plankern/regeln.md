@@ -31,6 +31,21 @@ hat oder der Plan einfach aussieht. Die Einzelheiten stehen unter «Ablauf».
 Kannst du einen Punkt nicht erfüllen (kein Python, Bild nicht als Datei, Mass fehlt), sag das
 der Person ausdrücklich, statt ihn still zu überspringen.
 
+**Das Ergebnis ist immer genau eine PDF aus `scripts/umbauplan.py`, für das Projekt der Person.**
+Keine zweite PDF, kein «Fotokonzept», keine angehängten oder zusammengefügten Seiten, keine
+Links auf Bilder. Fotos und Visualisierungen kommen nur über `plan.json` in den Plansatz.
+
+## Wenn etwas nicht klappt: so und nicht anders
+
+| Situation | Das tust du | Das tust du nie |
+|---|---|---|
+| Skizze oder Aufnahme ist eine **PDF** (Scan, Handschrift) | `python <kern>/scripts/seiten.py aufnahme.pdf` (mit uv: `uv run --with pymupdf python …`) und jede Seite als Bild ansehen; Details mit `--dpi 300` | sagen «nicht lesbar», ohne die Seiten als Bild angesehen zu haben |
+| Einzelne **Masse sind nicht lesbar** | sie gesammelt erfragen, mit Wand/Öffnung und wo sie auf der Skizze stehen | schätzen, weglassen, ein anderes Mass nehmen |
+| Person sagt «**mach es mit dem, was du hast**» | Plan ihres Raums aus allem Lesbaren; jedes fehlende Mass als Annahme in `angenommen` (zählt als Zustimmung), mit `--entwurf` erzeugen und die Annahmen nennen | ein Beispiel aus `beispiele/` zeichnen oder abgeben (das Skript lehnt das ab) |
+| **Skript** meldet MÄNGEL oder bricht ab | Ursache beheben, neu starten; geht es nicht, Fehlermeldung wörtlich zeigen | eigene PDF bauen (ReportLab, matplotlib, «vereinfacht») |
+| **Bild** liegt nicht als Datei vor | Person bitten, es herunterzuladen und wieder anzuhängen; dann neu erzeugen | Bild nur verlinken oder eine Beschreibung statt des Bilds |
+| Wunsch für die **Visualisierung** passt nicht zu `plan.json` (z. B. Wanne bleibt doch) | zuerst `plan.json` ändern, dann Bilder und Plan neu erzeugen: beides zeigt dieselbe Variante | Plan und Bilder mit verschiedenen Varianten abgeben |
+
 ## Worum es bei den Zeichnungen geht
 
 Die Skizzen und Pläne kommen aus **Küchenumbauten, Badumbauten und Gesamtrenovationen** von
@@ -76,7 +91,7 @@ Für alle Räume gilt:
 
 ## Ablauf
 
-1. **Skizze lesen.** Liste für dich: Aussenwände, Innenwände mit Dicke, Türen und
+1. **Skizze lesen.** PDF? Zuerst `scripts/seiten.py` (siehe Tabelle oben). Liste für dich: Aussenwände, Innenwände mit Dicke, Türen und
    Fenster mit Lage und Breite, Raumnamen, Küchen- und Sanitäreinrichtung (alt und neu),
    eingetragene Masse. Achte darauf, ob die Masse
    Aussen-, Achs- oder lichte Masse sind (siehe `datenmodell.md`).
