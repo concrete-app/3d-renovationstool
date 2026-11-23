@@ -17,6 +17,9 @@ in den Plansatz.
    ChatGPT schon in `/mnt/data/`).
 2. **Was ändert sich?** Gibt es schon `plan.json`, nimm aus dem Raum, den das Foto zeigt,
    die Objekte und Wände mit Status `abbruch` (verschwindet) und `neu` (kommt dazu).
+   Bei einer Küche mit Elementen (`artikel`) beschreibst du die neue Zeile von links nach
+   rechts aus den Elementen, wie sie im Foto stehen: Hochschränke mit Geräten, Unterschränke
+   mit Auszügen, Kochfeld, Spüle, Geschirrspüler, Oberschränke und Haube (siehe `kueche.md`).
    Sonst nimm, was die Person sagt. Fehlt Wichtiges (Wanne raus oder bleibt sie?), frage
    einmal knapp nach. Farben, Materialien und Stil aus der Nachricht der Person übernimmst
    du wörtlich in den Prompt.

@@ -668,3 +668,17 @@ def test_kueche_plansatz(tmp_path):
     assert umbauplan.main([str(tmp_path / "plan.json"), str(tmp_path / "aus"), "--entwurf"]) == 0
     assert (tmp_path / "aus" / "K-001_stueckliste.json").is_file()
     assert (tmp_path / "aus" / "K-001_umbau.pdf").is_file()
+
+
+# --- Skills: kuechenplan, badplan, gesamtplan --------------------------------
+
+SKILLS = SKILL.parent / "skills"
+
+
+@pytest.mark.parametrize("name", ["kuechenplan", "badplan", "gesamtplan"])
+def test_skill_verweist_auf_vorhandene_dateien(name):
+    import re
+    text = (SKILLS / name / "SKILL.md").read_text(encoding="utf-8")
+    assert text.startswith(f"---\nname: {name}\n")
+    for datei in set(re.findall(r"<kern>/([\w./-]+\.(?:md|json|py))", text)):
+        assert (SKILL / datei).is_file(), f"{name}: {datei} fehlt"
